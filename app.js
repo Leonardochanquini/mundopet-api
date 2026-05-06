@@ -23,12 +23,12 @@
             try {
                 // 1. Adicionado o fetch de clientes na mesma chamada
                 const [colabRes, transRes, estRes, agendaRes, pronRes, cliRes] = await Promise.all([
-                    fetch(`${API_BASE_URL}/api/colaboradores/${clinicaId}`),
-                    fetch(`${API_BASE_URL}/api/transacoes/${clinicaId}`),
-                    fetch(`${API_BASE_URL}/api/estoque/${clinicaId}`),
-                    fetch(`${API_BASE_URL}/api/agenda/${clinicaId}`).catch(() => null),
-                    fetch(`${API_BASE_URL}/api/prontuarios/${clinicaId}`).catch(() => null),
-                    fetch(`${API_BASE_URL}/api/clientes/${clinicaId}`).catch(() => null)
+                    fetch(`/api/colaboradores/${clinicaId}`),
+                    fetch(`/api/transacoes/${clinicaId}`),
+                    fetch(`/api/estoque/${clinicaId}`),
+                    fetch(`/api/agenda/${clinicaId}`).catch(() => null),
+                    fetch(`/api/prontuarios/${clinicaId}`).catch(() => null),
+                    fetch(`/api/clientes/${clinicaId}`).catch(() => null)
                 ]);
 
                 let mudouRecepcao = false;
@@ -166,7 +166,7 @@
             const senha = document.getElementById('login-senha').value;
 
             try {
-                const res = await fetch('${API_BASE_URL}/api/login', {
+                const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ email, senha })
@@ -179,7 +179,7 @@
                     clinicaLogada = { nome: data.user.nome, id: data.user.clinic_id, email: data.user.email, role: data.user.role };
                     
                     try {
-                        const clinicaRes = await fetch(`${API_BASE_URL}/api/clinica/${clinicaId}`);
+                        const clinicaRes = await fetch(`/api/clinica/${clinicaId}`);
                         if(clinicaRes.ok) {
                             const clinicaDados = await clinicaRes.json();
                             clinicaLogada.nomeClinica = clinicaDados.nome;
@@ -193,13 +193,13 @@
                             clinicaLogada.cargos = clinicaDados.cargos || '';
                         }
 
-                        const colabRes = await fetch(`${API_BASE_URL}/api/colaboradores/${clinicaId}`);
+                        const colabRes = await fetch(`/api/colaboradores/${clinicaId}`);
                         if(colabRes.ok) equipe = await colabRes.json();
 
-                        const transRes = await fetch(`${API_BASE_URL}/api/transacoes/${clinicaId}`);
+                        const transRes = await fetch(`/api/transacoes/${clinicaId}`);
                         if(transRes.ok) transacoes = await transRes.json();
 
-                        const estRes = await fetch(`${API_BASE_URL}/api/estoque/${clinicaId}`);
+                        const estRes = await fetch(`/api/estoque/${clinicaId}`);
                         if(estRes.ok) estoque = await estRes.json();
 
                     } catch (error) {
@@ -903,7 +903,7 @@
                 
                 // Força o carregamento dos clientes via API se ainda não tiverem sido carregados na sessão atual da Recepção
                 if (!window.clientesLista) {
-                    fetch('${API_BASE_URL}/api/clientes/' + clinicaId)
+                    fetch('/api/clientes/' + clinicaId)
                         .then(res => res.json())
                         .then(clientes => {
                             window.clientesLista = clientes;
@@ -976,7 +976,7 @@
 
         async function carregarAuditoria() {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/auditoria/${clinicaId}`);
+                const res = await fetch(`/api/auditoria/${clinicaId}`);
                 if (res.ok) {
                     const logs = await res.json();
                     let html = logs.map(a => `
@@ -1035,7 +1035,7 @@
             const novoStatus = equipe[idx].status === 'Ativo' ? 'Inativo' : 'Ativo';
             
             try {
-                const res = await fetch(`${API_BASE_URL}/api/colaborador/${id}/status`, {
+                const res = await fetch(`/api/colaborador/${id}/status`, {
                     method: 'PUT',
                     headers: getAuthHeaders(),
                     body: JSON.stringify({ status: novoStatus })
@@ -1113,7 +1113,7 @@
 
                 try {
                     if(editId) {
-                        const res = await fetch(`${API_BASE_URL}/api/colaborador/${editId}`, {
+                        const res = await fetch(`/api/colaborador/${editId}`, {
                             method: 'PUT',
                             headers: getAuthHeaders(),
                             body: JSON.stringify(dados)
@@ -1128,7 +1128,7 @@
                         const senha = document.getElementById('new-colab-senha').value;
                         if (!senha) return mostrarPopup('⚠️', 'Defina uma senha.');
                         
-                        const res = await fetch('${API_BASE_URL}/api/colaborador', {
+                        const res = await fetch('/api/colaborador', {
                             method: 'POST',
                             headers: getAuthHeaders(),
                             body: JSON.stringify({ ...dados, senha, clinica_id: clinicaId })
@@ -1221,7 +1221,7 @@
         async function deletarTransacao(id) {
             if(confirm("Deseja realmente apagar esta transação?")) {
                 try {
-                    const res = await fetch(`${API_BASE_URL}/api/transacoes/${id}`, { 
+                    const res = await fetch(`/api/transacoes/${id}`, { 
                         method: 'DELETE',
                         headers: {'X-Clinic-Id': clinicaId, 'X-Usuario-Nome': clinicaLogada.nome}
                     });
@@ -1338,18 +1338,18 @@
                 try {
                     let res;
                     if(editId) {
-                        res = await fetch(`${API_BASE_URL}/api/transacoes/${editId}`, {
+                        res = await fetch(`/api/transacoes/${editId}`, {
                             method: 'PUT', headers: getAuthHeaders(), body: JSON.stringify(payload)
                         });
                     } else {
-                        res = await fetch(`${API_BASE_URL}/api/transacoes`, {
+                        res = await fetch(`/api/transacoes`, {
                             method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(payload)
                         });
                     }
                     
                     if (res.ok) {
                         // Busca os dados novos do servidor imediatamente após o sucesso
-                        const resAtualizada = await fetch(`${API_BASE_URL}/api/transacoes/${clinicaId}`);
+                        const resAtualizada = await fetch(`/api/transacoes/${clinicaId}`);
                         transacoes = await resAtualizada.json();
                         
                         fecharModal();
@@ -1394,7 +1394,7 @@
             if(item.qtd + qtd >= 0) {
                 try {
                     const novaQtd = item.qtd + qtd;
-                    const res = await fetch(`${API_BASE_URL}/api/estoque/${item.id}/ajustar`, {
+                    const res = await fetch(`/api/estoque/${item.id}/ajustar`, {
                         method: 'PUT',
                         headers: getAuthHeaders(),
                         body: JSON.stringify({ qtd: novaQtd })
@@ -1413,7 +1413,7 @@
         async function deletarItemEstoque(id) {
             if(confirm("Deseja realmente excluir este item do estoque?")) {
                 try {
-                    const res = await fetch(`${API_BASE_URL}/api/estoque/${id}`, { 
+                    const res = await fetch(`/api/estoque/${id}`, { 
                         method: 'DELETE',
                         headers: {'X-Clinic-Id': clinicaId, 'X-Usuario-Nome': clinicaLogada.nome} 
                     });
@@ -1505,18 +1505,18 @@
                 };
 
                 try {
-                    const res = await fetch('${API_BASE_URL}/api/estoque', {
+                    const res = await fetch('/api/estoque', {
                         method: 'POST',
                         headers: getAuthHeaders(),
                         body: JSON.stringify(payload)
                     });
                     
                     if (res.ok) {
-                        const estRes = await fetch(`${API_BASE_URL}/api/estoque/${clinicaId}`);
+                        const estRes = await fetch(`/api/estoque/${clinicaId}`);
                         estoque = await estRes.json();
                         
                         if (gerarTransacao) {
-                            const transRes = await fetch(`${API_BASE_URL}/api/transacoes/${clinicaId}`);
+                            const transRes = await fetch(`/api/transacoes/${clinicaId}`);
                             transacoes = await transRes.json();
                         }
 
@@ -1637,7 +1637,7 @@
 
         async function finalizarCadastro() {
             try {
-                const response = await fetch('${API_BASE_URL}/api/assinatura-completa', {
+                const response = await fetch('/api/assinatura-completa', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1684,7 +1684,7 @@
             const novosCargos = document.getElementById('config-cargos-hidden').value;
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/clinica/${clinicaLogada.id}`, {
+                const res = await fetch(`/api/clinica/${clinicaLogada.id}`, {
                     method: 'PUT',
                     headers: getAuthHeaders(),
                     body: JSON.stringify({ 
@@ -1719,7 +1719,7 @@
             }
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/usuario/senha`, {
+                const res = await fetch(`/api/usuario/senha`, {
                     method: 'PUT',
                     headers: getAuthHeaders(),
                     body: JSON.stringify({ email: clinicaLogada.email, senha: novaSenha })
@@ -1874,7 +1874,7 @@
             }
         });
 
-        fetch(`${API_BASE_URL}/api/clientes/${clinicaId}`) // Ajuste a rota se a sua URL de clientes for diferente
+        fetch(`/api/clientes/${clinicaId}`) // Ajuste a rota se a sua URL de clientes for diferente
             .then(res => res.json())
             .then(clientes => {
                 const selectCliente = document.getElementById('agenda-cliente');
@@ -1908,7 +1908,7 @@
         const novoAgendamento = { clinic_id: clinicaId, cliente, pet, data, hora, tipo, especialidade: tipo === 'Consulta' ? especialidade : null, veterinario: tipo === 'Consulta' ? veterinario : null, obs };
 
         try {
-            await fetch('${API_BASE_URL}/api/agenda', {
+            await fetch('/api/agenda', {
                 method: 'POST',
                 headers: getAuthHeaders(),
                 body: JSON.stringify(novoAgendamento)
@@ -1935,7 +1935,7 @@
 // ================= FUNÇÕES DE CLIENTES =================
         async function carregarPets() {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/clientes/${clinicaId}`);
+                const res = await fetch(`/api/clientes/${clinicaId}`);
                 if (res.ok) {
                     window.clientesLista = await res.json();
                     renderPets(window.clientesLista);
@@ -2001,7 +2001,7 @@
         }
         async function carregarClientes() {
             try {
-                const res = await fetch(`${API_BASE_URL}/api/clientes/${clinicaId}`);
+                const res = await fetch(`/api/clientes/${clinicaId}`);
                 if (res.ok) {
                     window.clientesLista = await res.json();
                     renderClientes(window.clientesLista);
@@ -2194,7 +2194,7 @@
                 });
 
                 try {
-                    const res = await fetch('${API_BASE_URL}/api/clientes', {
+                    const res = await fetch('/api/clientes', {
                         method: 'POST',
                         headers: getAuthHeaders(),
                         body: JSON.stringify({ clinic_id: clinicaId, nome, cpf, telefone, endereco, pets: petsAdicionados })
@@ -2396,7 +2396,7 @@ async function editarCampoCliente(id, campo) {
     // 5. Continua com a mesma lógica que você já tinha para salvar no banco de dados[cite: 1]
     if (novoValor !== null && novoValor.trim() !== valorAtual) {
         try {
-            const res = await fetch(`${API_BASE_URL}/api/clientes/${id}`, {
+            const res = await fetch(`/api/clientes/${id}`, {
                 method: 'PUT',
                 headers: getAuthHeaders(),
                 body: JSON.stringify({ campo, valor: novoValor.trim() })
@@ -2425,7 +2425,7 @@ async function editarCampoCliente(id, campo) {
 
 window.atualizarStatusFila = async function(id, novoStatus) {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/agenda/status/${id}`, {
+        const res = await fetch(`/api/agenda/status/${id}`, {
             method: 'PUT',
             headers: getAuthHeaders(),
             body: JSON.stringify({ status: novoStatus })
@@ -2532,7 +2532,7 @@ window.fecharCaixaDia = function() {
         if (!payload.cliente || !payload.pet) return mostrarPopup('⚠️ Atenção', 'O Cliente e o Pet são obrigatórios.');
 
         try {
-            const res = await fetch('${API_BASE_URL}/api/prontuarios', {
+            const res = await fetch('/api/prontuarios', {
                 method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(payload)
             });
 
@@ -2540,7 +2540,7 @@ window.fecharCaixaDia = function() {
                 if (agendamento_id && typeof atualizarStatusFila === 'function') {
                     await atualizarStatusFila(agendamento_id, 'Finalizado');
                 }
-                const pronRes = await fetch(`${API_BASE_URL}/api/prontuarios/${clinicaId}`);
+                const pronRes = await fetch(`/api/prontuarios/${clinicaId}`);
                 if (pronRes.ok) prontuarios = await pronRes.json();
 
                 mostrarPopup('✅ Sucesso', 'Prontuário gerado com sucesso!');
