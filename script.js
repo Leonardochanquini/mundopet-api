@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const db = new sqlite3.Database('.data/mundopet_persistente_v2.db');
+const db = new sqlite3.Database('./mundopet_persistente_v2.db');
 
 db.serialize(() => {
     console.log("🛠️  Configurando banco de dados...");
