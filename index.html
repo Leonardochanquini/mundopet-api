@@ -6,57 +6,196 @@
     <title>Mundo Pet - Gestão Administrativa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .btn-principal { background: linear-gradient(90deg, #10b981, #3b82f6); color: white; cursor: pointer; transition: 0.3s; }
-        .btn-principal:hover { opacity: 0.9; transform: translateY(-1px); }
-        .card { background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px; }
-        .input-pet { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; }
-        .input-pet:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-        .tab-button { flex: 1; padding: 12px; font-weight: bold; border-bottom: 2px solid #e2e8f0; cursor: pointer; text-align: center; color: #94a3b8; }
-        .tab-button.active { color: #3b82f6; border-bottom-color: #3b82f6; background-color: #eff6ff; }
-        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px; cursor: pointer; color: #64748b; font-weight: 600; }
-        .sidebar-item.active { background-color: #3b82f6; color: white; }
-        .btn-voltar { position: absolute; top: 25px; left: 25px; font-weight: 800; color: #3b82f6; cursor: pointer; z-index: 100; }
-        
-        .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .popup-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .popup-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #1f2937; }
-        .popup-message { margin-bottom: 1.5rem; color: #6b7280; line-height: 1.5; }
-        .popup-button { width: 100%; padding: 12px 24px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: all 0.3s; border: none; }
-        .popup-button-primary { background: linear-gradient(90deg, #10b981, #3b82f6); color: white; }
-        .popup-button-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-        
-        .etapa-checkout { width: 95%; max-width: 500px; margin: 0 auto; }
-        @media (max-width: 640px) {
-            .etapa-checkout { width: 98%; padding: 15px; }
-            .card { padding: 15px; }
-            .popup-content { width: 95%; padding: 20px; }
-        }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 11px; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 13px; }
-        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .status-badge:hover { opacity: 0.8; }
-        
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; }
-        
-        @media print {
-            .no-print { display: none !important; }
-            .card { box-shadow: none; border: 1px solid #ddd; }
-        }
+        :root {
+    /* Paleta Clean e Moderna */
+    --bg-color: #f8fafc;        /* Off-white/Cinza muito claro para o fundo */
+    --text-color: #334155;      /* Cinza escuro para melhor legibilidade */
+    --text-muted: #64748b;
+    --primary-color: #3b82f6;   /* Azul vibrante profissional */
+    --primary-hover: #2563eb;
+    --secondary-color: #10b981; /* Verde esmeralda */
+    --border-color: #e2e8f0;
+    --card-bg: #ffffff;
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--bg-color); 
+    color: var(--text-color);
+    line-height: 1.6; /* Melhoria na legibilidade */
+}
+
+/* Padronização Global de Inputs e Selects */
+input, select, .input-pet { 
+    width: 100%; 
+    padding: 12px 16px; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    outline: none; 
+    color: var(--text-color);
+    background-color: var(--card-bg);
+    transition: all 0.2s ease-in-out;
+    font-family: 'Inter', sans-serif;
+}
+
+input:focus, select:focus, .input-pet:focus { 
+    border-color: var(--primary-color); 
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); 
+}
+
+/* Padronização Global de Botões */
+button {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-principal { 
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color)); 
+    color: white; 
+}
+
+.btn-principal:hover { 
+    opacity: 0.95; 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.25);
+}
+
+/* Atualização dos Cards */
+.card { 
+    background: var(--card-bg); 
+    border-radius: 12px; 
+    box-shadow: var(--shadow-soft); 
+    padding: 24px; 
+    border: 1px solid var(--border-color);
+}
+
+/* Adições para a Tela de Login Split */
+.login-split-container {
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    min-height: 450px; /* Garante uma altura agradável no desktop */
+}
+
+.login-visual-side {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+/* --- MANTIDO DO SEU CÓDIGO ORIGINAL PARA NÃO QUEBRAR O LAYOUT --- */
+.tab-button { flex: 1; padding: 12px; font-weight: bold; border-bottom: 2px solid var(--border-color); cursor: pointer; text-align: center; color: var(--text-muted); transition: 0.2s; }
+.tab-button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background-color: #eff6ff; }
+.sidebar-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    padding: 14px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    color: var(--text-muted); 
+    font-weight: 600; 
+    transition: all 0.2s ease-in-out; 
+}
+
+/* Novo Efeito de Hover Dinâmico */
+.sidebar-item:hover:not(.active) { 
+    background-color: #f1f5f9; /* Fundo cinza bem claro */
+    color: var(--primary-color); 
+    transform: translateX(4px); /* Leve movimento para a direita */
+}
+
+/* Reforço visual no item ativo */
+.sidebar-item.active { 
+    background-color: var(--primary-color); 
+    color: white; 
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25); 
+}
+.btn-voltar { position: absolute; top: 25px; left: 25px; font-weight: 800; color: var(--primary-color); cursor: pointer; z-index: 100; transition: 0.2s; }
+.btn-voltar:hover { color: var(--primary-hover); transform: translateX(-2px); }
+
+.popup-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(2px); }
+.popup-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 16px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.popup-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: var(--text-color); }
+.popup-message { margin-bottom: 1.5rem; color: var(--text-muted); line-height: 1.5; }
+.popup-button { width: 100%; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; border: none; }
+.popup-button-primary { background: var(--primary-color); color: white; }
+.popup-button-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+.etapa-checkout { width: 95%; max-width: 500px; margin: 0 auto; }
+@media (max-width: 640px) {
+    .etapa-checkout { width: 98%; padding: 15px; }
+    .card { padding: 15px; }
+    .popup-content { width: 95%; padding: 20px; }
+}
+
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-color); font-size: 14px; }
+.status-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.02em; }
+.status-badge:hover { opacity: 0.8; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
+.modal-content { background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 16px; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+@media print {
+    .no-print { display: none !important; }
+    .card { box-shadow: none; border: 1px solid #ddd; }
+}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
-    <div id="tela-inicio" class="h-screen flex flex-col items-center justify-center text-center p-4">
-        <h1 class="text-7xl font-black text-blue-600 mb-4 italic">Mundo Pet</h1>
-        <div class="flex gap-4">
-            <button onclick="irPara('tela-login')" class="btn-principal px-12 py-4 rounded-2xl font-bold">Entrar</button>
-            <button onclick="irPara('tela-planos')" class="bg-white border-2 border-gray-200 px-12 py-4 rounded-2xl font-bold">Planos</button>
+    <div id="tela-inicio" class="min-h-screen bg-[url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-fixed bg-center relative flex flex-col">
+        <!-- Máscara de Degradê (Gradient Overlay) -->
+        <div class="absolute inset-0 bg-gradient-to-b from-blue-900/80 via-gray-900/70 to-gray-900/95 z-0"></div>
+
+        <!-- Seção Principal (Hero) -->
+        <div class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center p-6">
+            <h1 class="text-6xl md:text-8xl font-black text-white mb-6 tracking-tight drop-shadow-lg italic">
+                Mundo <span class="text-blue-400">Pet</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-200 mb-10 max-w-2xl font-medium drop-shadow">
+                O sistema definitivo para a gestão inteligente, ágil e humanizada da sua clínica veterinária.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md mx-auto">
+                <!-- Botões originais com as exatas mesmas funções -->
+                <button onclick="irPara('tela-login')" class="btn-principal px-10 py-4 rounded-2xl font-bold text-lg w-full shadow-xl hover:scale-105 transition-transform">Entrar no Sistema</button>
+                <button onclick="irPara('tela-planos')" class="bg-white/10 backdrop-blur-md border-2 border-white/30 text-white px-10 py-4 rounded-2xl font-bold text-lg w-full hover:bg-white/20 transition-all">Ver Planos</button>
+            </div>
+            
+            <div onclick="rolarParaInformacoes()" class="absolute bottom-10 animate-bounce text-white/50 hidden md:block cursor-pointer hover:text-white transition-colors">
+                <i class="fa-solid fa-chevron-down text-3xl"></i>
+            </div>
+        </div>
+            <!-- Seção de Informações (Torna a tela rolável e profissional) -->
+            <div id="secao-informacoes" class="relative z-10 bg-white py-20 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Por que escolher o Mundo Pet?</h2>
+                    <p class="text-gray-500 text-lg">Tudo o que sua clínica precisa em um único ambiente.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-10 text-center">
+                    <div class="p-8 rounded-2xl bg-blue-50 border border-blue-100 hover:shadow-xl transition-shadow">
+                        <div class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-6"><i class="fa-solid fa-calendar-check"></i></div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Agenda Integrada</h3>
+                        <p class="text-gray-600">Controle de consultas, exames e retornos com visualização fácil para toda a equipe.</p>
+                    </div>
+                    <div class="p-8 rounded-2xl bg-green-50 border border-green-100 hover:shadow-xl transition-shadow">
+                        <div class="w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-6"><i class="fa-solid fa-file-medical"></i></div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Prontuário Eletrônico</h3>
+                        <p class="text-gray-600">Histórico completo do paciente, receituários e diagnósticos sempre à mão.</p>
+                    </div>
+                    <div class="p-8 rounded-2xl bg-purple-50 border border-purple-100 hover:shadow-xl transition-shadow">
+                        <div class="w-16 h-16 bg-purple-500 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-6"><i class="fa-solid fa-chart-line"></i></div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Gestão Financeira</h3>
+                        <p class="text-gray-600">Controle de caixa, faturamento, despesas de estoque e relatórios em tempo real.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -162,24 +301,34 @@
         </div>
     </div>
 
-    <div id="tela-login" class="hidden h-screen flex items-center justify-center bg-gray-50 relative">
+    <div id="tela-login" class="hidden h-screen flex items-center justify-center bg-gray-50 relative p-4">
         <div class="btn-voltar no-print" onclick="irPara('tela-inicio')">← VOLTAR</div>
-        <div class="card w-full max-w-md overflow-hidden p-0 shadow-2xl">
-            <div class="flex bg-gray-100 border-b">
-                <div onclick="mudarPerfil('admin')" id="tab-admin" class="tab-button active">Admin</div>
-                <div onclick="mudarPerfil('recepcao')" id="tab-recepcao" class="tab-button">Recepção</div>
-                <div onclick="mudarPerfil('vet')" id="tab-vet" class="tab-button">Vet</div>
+        
+        <div class="login-split-container flex flex-col md:flex-row w-full max-w-4xl bg-white overflow-hidden">
+            
+            <div class="login-visual-side flex flex-col justify-center p-10 text-white md:w-1/2 text-center md:text-left">
+                <h2 class="text-4xl font-black mb-4 italic">Bem-vindo ao<br>Mundo Pet</h2>
+                <p class="text-lg opacity-90 font-medium">O sistema completo para a gestão inteligente e humanizada da sua clínica veterinária.</p>
             </div>
-            <div class="p-8">
-                <input id="login-email" placeholder="E-mail" class="input-pet mb-3">
-                <input id="login-senha" type="password" placeholder="Senha" class="input-pet mb-6">
-                <button onclick="efetuarLogin()" class="w-full btn-principal py-3 rounded-xl font-bold">Entrar no Painel</button>
+
+            <div class="md:w-1/2 flex flex-col justify-center bg-white">
+                <div class="flex bg-gray-100 border-b">
+                    <div onclick="mudarPerfil('admin')" id="tab-admin" class="tab-button active">Admin</div>
+                    <div onclick="mudarPerfil('recepcao')" id="tab-recepcao" class="tab-button">Recepção</div>
+                    <div onclick="mudarPerfil('vet')" id="tab-vet" class="tab-button">Vet</div>
+                </div>
+                <div class="p-8">
+                    <input id="login-email" placeholder="E-mail" class="input-pet mb-3">
+                    <input id="login-senha" type="password" placeholder="Senha" class="input-pet mb-6">
+                    <button onclick="efetuarLogin()" class="w-full btn-principal py-3 rounded-xl font-bold text-lg">Entrar no Painel</button>
+                </div>
             </div>
+            
         </div>
     </div>
 
     <div id="app-container" class="hidden h-screen flex">
-        <aside class="w-64 bg-white border-r p-6 flex flex-col no-print">
+        <aside class="w-64 bg-white p-6 flex flex-col no-print z-10 shadow-[4px_0_24px_rgba(0,0,0,0.03)]">
             <div id="clinica-logo-container" class="text-2xl font-black text-blue-600 mb-10 italic flex items-center gap-2">
                 🐾 Mundo Pet
             </div>
@@ -193,7 +342,7 @@
             <button onclick="logout()" class="text-red-500 font-bold p-4 hover:bg-red-50 rounded-xl text-left mt-auto">Sair</button>
         </aside>
 
-        <main class="flex-grow p-10 bg-gray-50 overflow-y-auto">
+        <main class="flex-grow p-10 bg-[#f8fafc] overflow-y-auto relative">
             <header class="flex justify-between items-center mb-8 no-print">
                 <div>
                     <h2 id="modulo-titulo" class="text-3xl font-bold text-gray-800">Painel</h2>
