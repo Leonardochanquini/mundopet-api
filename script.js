@@ -25,7 +25,7 @@ db.serialize(() => {
         email_contato TEXT,
         categorias_prontuario TEXT,
         tipos_animais TEXT,
-        cargos TEXT,
+        cargos TEXT
     )`)
 });
 
