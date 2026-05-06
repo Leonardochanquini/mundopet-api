@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundo Pet - Gestão Administrativa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .btn-principal { background: linear-gradient(90deg, #10b981, #3b82f6); color: white; cursor: pointer; transition: 0.3s; }
+        .btn-principal:hover { opacity: 0.9; transform: translateY(-1px); }
+        .card { background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px; }
+        .input-pet { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; outline: none; }
+        .input-pet:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .tab-button { flex: 1; padding: 12px; font-weight: bold; border-bottom: 2px solid #e2e8f0; cursor: pointer; text-align: center; color: #94a3b8; }
+        .tab-button.active { color: #3b82f6; border-bottom-color: #3b82f6; background-color: #eff6ff; }
+        .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 12px; cursor: pointer; color: #64748b; font-weight: 600; }
+        .sidebar-item.active { background-color: #3b82f6; color: white; }
+        .btn-voltar { position: absolute; top: 25px; left: 25px; font-weight: 800; color: #3b82f6; cursor: pointer; z-index: 100; }
+        
+        .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .popup-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .popup-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #1f2937; }
+        .popup-message { margin-bottom: 1.5rem; color: #6b7280; line-height: 1.5; }
+        .popup-button { width: 100%; padding: 12px 24px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: all 0.3s; border: none; }
+        .popup-button-primary { background: linear-gradient(90deg, #10b981, #3b82f6); color: white; }
+        .popup-button-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .etapa-checkout { width: 95%; max-width: 500px; margin: 0 auto; }
+        @media (max-width: 640px) {
+            .etapa-checkout { width: 98%; padding: 15px; }
+            .card { padding: 15px; }
+            .popup-content { width: 95%; padding: 20px; }
+        }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 11px; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 13px; }
+        .status-badge { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .status-badge:hover { opacity: 0.8; }
+        
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .card { box-shadow: none; border: 1px solid #ddd; }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <div id="tela-inicio" class="h-screen flex flex-col items-center justify-center text-center p-4">
+        <h1 class="text-7xl font-black text-blue-600 mb-4 italic">Mundo Pet</h1>
+        <div class="flex gap-4">
+            <button onclick="irPara('tela-login')" class="btn-principal px-12 py-4 rounded-2xl font-bold">Entrar</button>
+            <button onclick="irPara('tela-planos')" class="bg-white border-2 border-gray-200 px-12 py-4 rounded-2xl font-bold">Planos</button>
+        </div>
+    </div>
+
+    <div id="tela-planos" class="hidden min-h-screen flex flex-col items-center justify-center bg-gray-50 relative">
+        <div class="btn-voltar no-print" onclick="irPara('tela-inicio')">← VOLTAR</div>
+        <h2 class="text-4xl font-extrabold mb-12">Escolha seu plano</h2>
+        <div class="grid md:grid-cols-2 gap-8 w-full max-w-4xl px-4">
+            <div class="card border-2 cursor-pointer" onclick="selecionarPlano('Prata', 99)">
+                <h3 class="text-xl font-bold text-gray-400">Plano Prata</h3>
+                <p class="text-5xl font-black my-6">R$ 99</p>
+                <button class="w-full btn-principal py-3 rounded-xl font-bold">Selecionar</button>
+            </div>
+            <div class="card border-4 border-blue-500 scale-105 cursor-pointer" onclick="selecionarPlano('Ouro', 199)">
+                <h3 class="text-xl font-bold text-blue-600">Plano Ouro 🏆</h3>
+                <p class="text-5xl font-black my-6">R$ 199</p>
+                <button class="w-full btn-principal py-3 rounded-xl font-bold">Selecionar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tela-checkout" class="hidden min-h-screen bg-gray-100 flex items-center justify-center relative p-6">
+        <div class="btn-voltar no-print" onclick="irPara('tela-planos')">← VOLTAR</div>
+        
+        <div id="etapa-1" class="etapa-checkout card w-full max-w-lg">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div><span class="font-bold text-blue-600">Dados da Clínica</span></div>
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center font-bold text-sm">2</div><span class="text-gray-400">Colaboradores</span></div>
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center font-bold text-sm">3</div><span class="text-gray-400">Pagamento</span></div>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold mb-6">Informações da Clínica</h3>
+            <div class="space-y-4">
+                <div><label class="text-xs font-bold text-gray-500 mb-1 block">Nome da Clínica</label><input id="clinica-nome" placeholder="Ex: Clínica Veterinária Pet Vida" class="input-pet"></div>
+                <div><label class="text-xs font-bold text-gray-500 mb-1 block">CNPJ</label><input id="clinica-cnpj" placeholder="00.000.000/0001-00" class="input-pet" onkeyup="mascaraCNPJ(this)"></div>
+                <div><label class="text-xs font-bold text-gray-500 mb-1 block">Telefone</label><input id="clinica-telefone" placeholder="(11) 99999-9999" class="input-pet" onkeyup="mascaraTelefone(this)"></div>
+                <div><label class="text-xs font-bold text-gray-500 mb-1 block">E-mail Administrativo</label><input id="clinica-email" type="email" placeholder="admin@clinica.com" class="input-pet"></div>
+                <div><label class="text-xs font-bold text-gray-500 mb-1 block">Senha de Acesso</label><input id="clinica-senha" type="password" placeholder="Mínimo 6 caracteres" class="input-pet"></div>
+            </div>
+            <p id="info-plano-etapa1" class="text-sm text-blue-500 font-bold mt-4"></p>
+            <button onclick="validarEtapa1()" class="w-full btn-principal py-4 rounded-xl font-bold mt-6">Continuar</button>
+        </div>
+
+        <div id="etapa-2" class="etapa-checkout card w-full max-w-lg hidden">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">✓</div><span class="font-bold text-green-600">Dados da Clínica</span></div>
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div><span class="font-bold text-blue-600">Colaboradores</span></div>
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center font-bold text-sm">3</div><span class="text-gray-400">Pagamento</span></div>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold mb-6">Cadastro de Colaboradores</h3>
+            <div class="space-y-4">
+                <div id="colaboradores-lista"></div>
+                <button onclick="adicionarColaborador()" class="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition">+ Adicionar Colaborador</button>
+            </div>
+            <div class="flex gap-4 mt-6">
+                <button onclick="voltarEtapa2()" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-bold">Voltar</button>
+                <button onclick="validarEtapa2()" class="flex-1 btn-principal py-4 rounded-xl font-bold">Continuar</button>
+            </div>
+        </div>
+
+        <div id="etapa-3" class="etapa-checkout card w-full max-w-lg hidden">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">✓</div><span class="font-bold text-green-600">Dados da Clínica</span></div>
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">✓</div><span class="font-bold text-green-600">Colaboradores</span></div>
+                    <div class="flex items-center gap-2"><div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">3</div><span class="font-bold text-blue-600">Pagamento</span></div>
+                </div>
+            </div>
+            
+            <h3 class="text-2xl font-bold mb-6">Informações de Pagamento</h3>
+            <div class="space-y-4">
+                <div><label class="text-xs font-bold text-gray-500 mb-1 block">Nome do Titular do Cartão</label><input id="cartao-nome" placeholder="Como está no cartão" class="input-pet"></div>
+                <div><label class="text-xs font-bold text-gray-500 mb-1 block">Número do Cartão</label><input id="cartao-numero" placeholder="0000 0000 0000 0000" class="input-pet" onkeyup="mascaraCartao(this)"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-xs font-bold text-gray-500 mb-1 block">Validade</label><input id="cartao-validade" placeholder="MM/AA" class="input-pet" onkeyup="mascaraValidade(this)"></div>
+                    <div><label class="text-xs font-bold text-gray-500 mb-1 block">CVV</label><input id="cartao-cvv" placeholder="123" class="input-pet" onkeyup="mascaraCVV(this)" maxlength="4"></div>
+                </div>
+                <div><label class="text-xs font-bold text-gray-500 mb-1 block">Método de Pagamento</label>
+                    <select id="metodo-pagamento" class="input-pet">
+                        <option value="credito">Cartão de Crédito</option>
+                        <option value="debito">Cartão de Débito</option>
+                        <option value="pix">Pix</option>
+                        <option value="boleto">Boleto Bancário</option>
+                    </select>
+                </div>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl mt-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600">Plano Selecionado:</span><span id="resumo-plano" class="font-bold text-blue-600"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-lg font-bold">Total:</span><span id="resumo-total" class="text-2xl font-bold text-blue-600"></span>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-6">
+                <button onclick="voltarEtapa3()" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-bold">Voltar</button>
+                <button onclick="finalizarCadastro()" class="flex-1 btn-principal py-4 rounded-xl font-bold">Finalizar Cadastro</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tela-login" class="hidden h-screen flex items-center justify-center bg-gray-50 relative">
+        <div class="btn-voltar no-print" onclick="irPara('tela-inicio')">← VOLTAR</div>
+        <div class="card w-full max-w-md overflow-hidden p-0 shadow-2xl">
+            <div class="flex bg-gray-100 border-b">
+                <div onclick="mudarPerfil('admin')" id="tab-admin" class="tab-button active">Admin</div>
+                <div onclick="mudarPerfil('recepcao')" id="tab-recepcao" class="tab-button">Recepção</div>
+                <div onclick="mudarPerfil('vet')" id="tab-vet" class="tab-button">Vet</div>
+            </div>
+            <div class="p-8">
+                <input id="login-email" placeholder="E-mail" class="input-pet mb-3">
+                <input id="login-senha" type="password" placeholder="Senha" class="input-pet mb-6">
+                <button onclick="efetuarLogin()" class="w-full btn-principal py-3 rounded-xl font-bold">Entrar no Painel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden h-screen flex">
+        <aside class="w-64 bg-white border-r p-6 flex flex-col no-print">
+            <div id="clinica-logo-container" class="text-2xl font-black text-blue-600 mb-10 italic flex items-center gap-2">
+                🐾 Mundo Pet
+            </div>
+            
+            <nav id="menu-lateral" class="flex-grow space-y-1"></nav>
+            
+            <div id="menu-configuracoes" class="hidden mb-2">
+                <div onclick="navegarModulo('configuracoes')" class="sidebar-item" id="m-configuracoes">⚙️ Configurações</div>
+            </div>
+            
+            <button onclick="logout()" class="text-red-500 font-bold p-4 hover:bg-red-50 rounded-xl text-left mt-auto">Sair</button>
+        </aside>
+
+        <main class="flex-grow p-10 bg-gray-50 overflow-y-auto">
+            <header class="flex justify-between items-center mb-8 no-print">
+                <div>
+                    <h2 id="modulo-titulo" class="text-3xl font-bold text-gray-800">Painel</h2>
+                    <p id="clinica-tag" class="text-blue-500 font-bold text-xs uppercase mt-1"></p>
+                </div>
+                <div id="header-actions" class="flex gap-3"></div>
+            </header>
+            <div id="conteudo-dinamico"></div>
+        </main>
+    </div>
+
+    <div id="popup-container" class="popup-overlay" onclick="fecharPopup(event)">
+        <div class="popup-content" onclick="event.stopPropagation()">
+            <h3 id="popup-titulo" class="popup-title"></h3>
+            <p id="popup-mensagem" class="popup-message"></p>
+            <button onclick="fecharPopup()" class="popup-button popup-button-primary">OK</button>
+        </div>
+    </div>
+
+    <div id="modal-container" class="modal-overlay" onclick="fecharModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 id="modal-titulo" class="text-2xl font-bold mb-6 text-gray-800"></h3>
+            <div id="modal-body"></div>
+            <div class="flex justify-end gap-3 mt-8">
+                <button onclick="fecharModal()" class="px-6 py-2 font-bold text-gray-400 hover:bg-gray-100 rounded-xl">Cancelar</button>
+                <button id="modal-confirmar" class="btn-principal px-8 py-2 rounded-xl font-bold">Salvar</button>
+            </div>
+        </div>
+    </div>
+    <script src="./app.js"></script>
+</body>
+</html>
