@@ -149,7 +149,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
-    <div id="tela-inicio" class="min-h-screen bg-[url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-fixed bg-center relative flex flex-col">
+    <div id="tela-inicio" class="h-screen overflow-y-auto bg-[url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-fixed bg-center relative flex flex-col">
         <!-- Máscara de Degradê (Gradient Overlay) -->
         <div class="absolute inset-0 bg-gradient-to-b from-blue-900/80 via-gray-900/70 to-gray-900/95 z-0"></div>
 
@@ -161,13 +161,12 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
             <p class="text-xl md:text-2xl text-gray-200 mb-10 max-w-2xl font-medium drop-shadow">
                 O sistema definitivo para a gestão inteligente, ágil e humanizada da sua clínica veterinária.
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md mx-auto">
-                <!-- Botões originais com as exatas mesmas funções -->
-                <button onclick="irPara('tela-login')" class="btn-principal px-10 py-4 rounded-2xl font-bold text-lg w-full shadow-xl hover:scale-105 transition-transform">Entrar no Sistema</button>
-                <button onclick="irPara('tela-planos')" class="bg-white/10 backdrop-blur-md border-2 border-white/30 text-white px-10 py-4 rounded-2xl font-bold text-lg w-full hover:bg-white/20 transition-all">Ver Planos</button>
+            <<div class="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md mx-auto">
+                <button id="btn-entrar" class="btn-principal px-10 py-4 rounded-2xl font-bold text-lg w-full shadow-xl hover:scale-105 transition-transform z-20">Entrar no Sistema</button>
+                <button id="btn-planos" class="bg-white/10 backdrop-blur-md border-2 border-white/30 text-white px-10 py-4 rounded-2xl font-bold text-lg w-full hover:bg-white/20 transition-all z-20">Ver Planos</button>
             </div>
             
-            <div onclick="rolarParaInformacoes()" class="absolute bottom-10 animate-bounce text-white/50 hidden md:block cursor-pointer hover:text-white transition-colors">
+            <div id="seta-scroll" class="absolute bottom-10 animate-bounce text-white/50 hidden md:block cursor-pointer hover:text-white transition-colors z-20">
                 <i class="fa-solid fa-chevron-down text-3xl"></i>
             </div>
         </div>
@@ -372,6 +371,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
             </div>
         </div>
     </div>
+    <script src="./inicio.js"></script>
     <script src="./app.js"></script>
 </body>
 </html>
