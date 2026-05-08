@@ -201,15 +201,10 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
     <div id="tela-planos" class="hidden h-screen overflow-y-auto flex flex-col items-center justify-start bg-gray-50 relative py-24">
         <div class="btn-voltar no-print" onclick="irPara('tela-inicio')">← VOLTAR</div>
         <h2 class="text-4xl font-extrabold mb-12">Escolha seu plano</h2>
-        <div class="grid md:grid-cols-2 gap-8 w-full max-w-4xl px-4">
-            <div class="card border-2 cursor-pointer" onclick="selecionarPlano('Prata', 99)">
-                <h3 class="text-xl font-bold text-gray-400">Plano Prata</h3>
-                <p class="text-5xl font-black my-6">R$ 99</p>
-                <button class="w-full btn-principal py-3 rounded-xl font-bold">Selecionar</button>
-            </div>
-            <div class="card border-4 border-blue-500 scale-105 cursor-pointer" onclick="selecionarPlano('Ouro', 199)">
-                <h3 class="text-xl font-bold text-blue-600">Plano Ouro 🏆</h3>
-                <p class="text-5xl font-black my-6">R$ 199</p>
+        <div class="flex justify-center w-full max-w-4xl px-4">
+            <div class="card border-4 border-blue-500 scale-105 cursor-pointer w-full max-w-sm text-center" onclick="selecionarPlano('Único', 50)">
+                <h3 class="text-xl font-bold text-blue-600">Plano Único 🏆</h3>
+                <p class="text-5xl font-black my-6">R$ 50</p>
                 <button class="w-full btn-principal py-3 rounded-xl font-bold">Selecionar</button>
             </div>
         </div>
