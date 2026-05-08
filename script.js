@@ -438,9 +438,5 @@ app.post('/api/prontuarios', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`🚀 Servidor Mundo Pet rodando em http://localhost:${port}`);
-<<<<<<< HEAD
+    console.log(`🚀 Servidor Mundo Pet rodando em http://localhost:${port}`)
 });
-=======
-});
->>>>>>> ed9ceda72a9bd858ffde6a8dc420c3ae76166e04
