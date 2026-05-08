@@ -152,6 +152,21 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
     <div id="tela-inicio" class="h-screen overflow-y-auto bg-[url('https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-fixed bg-center relative flex flex-col">
         <!-- Máscara de Degradê (Gradient Overlay) -->
         <div class="absolute inset-0 bg-gradient-to-b from-blue-900/80 via-gray-900/70 to-gray-900/95 z-0"></div>
+        <header class="fixed top-0 w-full z-50 bg-blue-950/80 backdrop-blur-md border-b border-white/10 px-6 py-4 flex justify-between items-center transition-all">
+            <div class="text-2xl font-black text-white tracking-tight drop-shadow-md italic cursor-pointer" onclick="irPara('tela-inicio')">
+                Mundo <span class="text-blue-400">Pet</span>
+            </div>
+            
+            <nav class="hidden md:flex gap-8 text-gray-200 font-medium">
+                <a href="#secao-informacoes" class="hover:text-white transition-colors">Recursos</a>
+                <a href="#" onclick="irPara('tela-planos'); return false;" class="hover:text-white transition-colors">Planos</a>
+                <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
+            </nav>
+            
+            <button onclick="irPara('tela-login')" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-6 py-2 rounded-xl font-bold transition-all shadow-sm">
+                Entrar
+            </button>
+        </header>
 
         <!-- Seção Principal (Hero) -->
         <div class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center p-6">
