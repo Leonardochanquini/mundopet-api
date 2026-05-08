@@ -198,7 +198,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
         </div>
     </div>
 
-    <div id="tela-planos" class="hidden min-h-screen flex flex-col items-center justify-center bg-gray-50 relative">
+    <div id="tela-planos" class="hidden h-screen overflow-y-auto flex flex-col items-center justify-start bg-gray-50 relative py-24">
         <div class="btn-voltar no-print" onclick="irPara('tela-inicio')">← VOLTAR</div>
         <h2 class="text-4xl font-extrabold mb-12">Escolha seu plano</h2>
         <div class="grid md:grid-cols-2 gap-8 w-full max-w-4xl px-4">
@@ -215,7 +215,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
         </div>
     </div>
 
-    <div id="tela-checkout" class="hidden min-h-screen bg-gray-100 flex items-center justify-center relative p-6">
+    <div id="tela-checkout" class="hidden h-screen overflow-y-auto bg-gray-100 flex flex-col items-center justify-start relative px-6 py-24">
         <div class="btn-voltar no-print" onclick="irPara('tela-planos')">← VOLTAR</div>
         
         <div id="etapa-1" class="etapa-checkout card w-full max-w-lg">
@@ -300,7 +300,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
         </div>
     </div>
 
-    <div id="tela-login" class="hidden h-screen flex items-center justify-center bg-gray-50 relative p-4">
+    <div id="tela-login" class="hidden h-screen overflow-y-auto flex flex-col items-center justify-start bg-gray-50 relative px-4 py-24">
         <div class="btn-voltar no-print" onclick="irPara('tela-inicio')">← VOLTAR</div>
         
         <div class="login-split-container flex flex-col md:flex-row w-full max-w-4xl bg-white overflow-hidden">
