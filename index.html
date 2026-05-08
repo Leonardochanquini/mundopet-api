@@ -176,7 +176,8 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
             <p class="text-xl md:text-2xl text-gray-200 mb-10 max-w-2xl font-medium drop-shadow">
                 O sistema definitivo para a gestão inteligente, ágil e humanizada da sua clínica veterinária.
             </p>
-            <<div class="flex flex-col sm:flex-row gap-4 w-full justify-center max-w-md mx-auto">
+            <div class="flex flex-col md:flex-row gap-4 w-full justify-center max-w-4xl mx-auto">
+                <button id="btn-testar" class="bg-gradient-to-r from-emerald-400 to-blue-500 hover:from-emerald-500 hover:to-blue-600 text-white px-10 py-4 rounded-2xl font-extrabold text-lg w-full shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:scale-105 transition-all z-20 border border-emerald-300/50">Testar Grátis</button>
                 <button id="btn-entrar" class="btn-principal px-10 py-4 rounded-2xl font-bold text-lg w-full shadow-xl hover:scale-105 transition-transform z-20">Entrar no Sistema</button>
                 <button id="btn-planos" class="bg-white/10 backdrop-blur-md border-2 border-white/30 text-white px-10 py-4 rounded-2xl font-bold text-lg w-full hover:bg-white/20 transition-all z-20">Ver Planos</button>
             </div>
@@ -192,7 +193,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
                     <h2 class="text-4xl font-bold text-gray-800 mb-4">Por que escolher o Mundo Pet?</h2>
                     <p class="text-gray-500 text-lg">Tudo o que sua clínica precisa em um único ambiente.</p>
                 </div>
-                <div class="grid md:grid-cols-3 gap-10 text-center">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
                     <div class="p-8 rounded-2xl bg-blue-50 border border-blue-100 hover:shadow-xl transition-shadow">
                         <div class="w-16 h-16 bg-blue-500 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-6"><i class="fa-solid fa-calendar-check"></i></div>
                         <h3 class="text-xl font-bold text-gray-800 mb-3">Agenda Integrada</h3>
@@ -208,6 +209,67 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
                         <h3 class="text-xl font-bold text-gray-800 mb-3">Gestão Financeira</h3>
                         <p class="text-gray-600">Controle de caixa, faturamento, despesas de estoque e relatórios em tempo real.</p>
                     </div>
+                    <div class="p-8 rounded-2xl bg-purple-50 border border-purple-100 hover:shadow-xl transition-shadow">
+                        <div class="w-16 h-16 bg-purple-500 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-6"><i class="fa-solid fa-chart-line"></i></div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Gestão Financeira</h3>
+                        <p class="text-gray-600">Controle de caixa, faturamento, despesas de estoque e relatórios em tempo real.</p>
+                    </div>
+                    
+                    <div class="p-8 rounded-2xl bg-amber-50 border border-amber-100 hover:shadow-xl transition-shadow">
+                        <div class="w-16 h-16 bg-amber-500 text-white rounded-full flex items-center justify-center text-2xl mx-auto mb-6"><i class="fa-solid fa-box-open"></i></div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-3">Controle de Estoque</h3>
+                        <p class="text-gray-600">Gestão inteligente de vacinas, medicamentos, lotes e validades com alertas automáticos.</p>
+                    </div>
+                    </div> </div>
+        </div>
+        <div id="secao-conheca" class="relative z-10 bg-slate-50 py-20 px-6 border-t border-slate-200">
+                <div class="max-w-6xl mx-auto">
+                    <div class="text-center mb-16">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-4">Conheça por Dentro</h2>
+                        <p class="text-gray-500 text-lg">Uma visão geral da nossa interface projetada para facilitar o seu dia a dia.</p>
+                    </div>
+                    
+                    <div class="mx-auto rounded-xl shadow-2xl overflow-hidden border border-gray-300 bg-white max-w-5xl">
+                        
+                        <div class="bg-gray-100 px-4 py-3 flex items-center gap-2 border-b border-gray-300 relative">
+                            <div class="flex gap-2 z-10">
+                                <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="bg-white border border-gray-200 rounded-md px-4 py-1 text-xs text-gray-400 shadow-sm font-medium">
+                                    app.mundopet.com/dashboard
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 w-full h-[400px] md:h-[600px] flex items-center justify-center">
+                            <div class="text-gray-400 flex flex-col items-center">
+                                <i class="fa-solid fa-image text-5xl mb-4 opacity-50"></i>
+                                <span class="font-semibold text-lg">Espaço reservado para o print do sistema</span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            ```
+
+**Como deve ficar o visual do seu código após a colagem:**
+A estrutura no seu editor ficará assim:
+
+```html
+                    </div>
+                    </div> </div>
+        </div>
+        
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tela-planos" class="hidden h-screen overflow-y-auto ...">
                 </div>
             </div>
         </div>
