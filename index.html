@@ -198,19 +198,19 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
         </div>
     </div>
 
-    <div id="tela-planos" class="hidden h-screen overflow-y-auto flex flex-col items-center justify-start bg-gray-50 relative py-24">
+    <div id="tela-planos" class="hidden h-screen overflow-y-auto flex flex-col items-center justify-start bg-gray-50 relative py-12">
         <div class="btn-voltar no-print" onclick="irPara('tela-inicio')">← VOLTAR</div>
-        <h2 class="text-4xl font-extrabold mb-12">Escolha seu plano</h2>
+        <h2 class="text-3xl font-extrabold mb-8 mt-8">Escolha seu plano</h2>
         <div class="flex justify-center w-full max-w-4xl px-4">
-            <div class="card border-4 border-blue-500 scale-105 cursor-pointer w-full max-w-sm text-center" onclick="selecionarPlano('Único', 50)">
+            <div class="card border-4 border-blue-500 hover:scale-105 transition-transform cursor-pointer w-full max-w-sm text-center" onclick="selecionarPlano('Único', 50)">
                 <h3 class="text-xl font-bold text-blue-600">Plano Único 🏆</h3>
-                <p class="text-5xl font-black my-6">R$ 50</p>
+                <p class="text-4xl font-black my-4">R$ 50</p>
                 <button class="w-full btn-principal py-3 rounded-xl font-bold">Selecionar</button>
             </div>
         </div>
     </div>
 
-    <div id="tela-checkout" class="hidden h-screen overflow-y-auto bg-gray-100 flex flex-col items-center justify-start relative px-6 py-24">
+    <div id="tela-checkout" class="hidden h-screen overflow-y-auto bg-gray-100 flex flex-col items-center justify-start relative px-6 py-10">
         <div class="btn-voltar no-print" onclick="irPara('tela-planos')">← VOLTAR</div>
         
         <div id="etapa-1" class="etapa-checkout card w-full max-w-lg">
@@ -231,7 +231,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
                 <div><label class="text-xs font-bold text-gray-500 mb-1 block">Senha de Acesso</label><input id="clinica-senha" type="password" placeholder="Mínimo 6 caracteres" class="input-pet"></div>
             </div>
             <p id="info-plano-etapa1" class="text-sm text-blue-500 font-bold mt-4"></p>
-            <button onclick="validarEtapa1()" class="w-full btn-principal py-4 rounded-xl font-bold mt-6">Continuar</button>
+            <button onclick="validarEtapa1()" class="w-full btn-principal py-3 rounded-xl font-bold mt-4">Continuar</button>
         </div>
 
         <div id="etapa-2" class="etapa-checkout card w-full max-w-lg hidden">
@@ -248,9 +248,9 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
                 <div id="colaboradores-lista"></div>
                 <button onclick="adicionarColaborador()" class="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition">+ Adicionar Colaborador</button>
             </div>
-            <div class="flex gap-4 mt-6">
-                <button onclick="voltarEtapa2()" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-bold">Voltar</button>
-                <button onclick="validarEtapa2()" class="flex-1 btn-principal py-4 rounded-xl font-bold">Continuar</button>
+            <div class="flex gap-4 mt-4">
+                <button onclick="voltarEtapa2()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold">Voltar</button>
+                <button onclick="validarEtapa2()" class="flex-1 btn-principal py-3 rounded-xl font-bold">Continuar</button>
             </div>
         </div>
 
@@ -288,9 +288,9 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
                     <span class="text-lg font-bold">Total:</span><span id="resumo-total" class="text-2xl font-bold text-blue-600"></span>
                 </div>
             </div>
-            <div class="flex gap-4 mt-6">
-                <button onclick="voltarEtapa3()" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl font-bold">Voltar</button>
-                <button onclick="finalizarCadastro()" class="flex-1 btn-principal py-4 rounded-xl font-bold">Finalizar Cadastro</button>
+            <div class="flex gap-4 mt-4">
+                <button onclick="voltarEtapa3()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold">Voltar</button>
+                <button onclick="finalizarCadastro()" class="flex-1 btn-principal py-3 rounded-xl font-bold">Finalizar Cadastro</button>
             </div>
         </div>
     </div>
