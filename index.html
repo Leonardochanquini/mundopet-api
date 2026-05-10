@@ -255,6 +255,43 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
                     </div>
                 </div>
             </div>
+            <div id="faq" class="relative z-10 bg-white py-20 px-6 border-t border-slate-200">
+    <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-gray-800 mb-4">Perguntas Frequentes</h2>
+            <p class="text-gray-500 text-lg">Tire suas dúvidas sobre o Mundo Pet.</p>
+        </div>
+        <div class="space-y-4">
+            <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                <button class="faq-btn w-full text-left px-6 py-4 font-bold text-gray-800 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                    O sistema precisa ser instalado no computador?
+                    <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-gray-50">
+                    <p class="p-6 text-gray-600 border-t border-gray-100">Não, o Mundo Pet é 100% online e pode ser acessado de qualquer navegador.</p>
+                </div>
+            </div>
+            <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                <button class="faq-btn w-full text-left px-6 py-4 font-bold text-gray-800 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                    Como funciona o suporte técnico?
+                    <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-gray-50">
+                    <p class="p-6 text-gray-600 border-t border-gray-100">Nosso suporte funciona de segunda a sexta, via chat integrado e e-mail.</p>
+                </div>
+            </div>
+            <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+                <button class="faq-btn w-full text-left px-6 py-4 font-bold text-gray-800 flex justify-between items-center hover:bg-gray-50 transition-colors">
+                    Posso acessar pelo celular ou tablet?
+                    <i class="fa-solid fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </button>
+                <div class="faq-content max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-gray-50">
+                    <p class="p-6 text-gray-600 border-t border-gray-100">Sim, o design do sistema é responsivo e se adapta perfeitamente a dispositivos móveis.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div id="secao-seguranca" class="relative z-10 w-full bg-gray-900 py-8 px-6 border-t border-gray-800 mt-auto">
             <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
                 <div class="w-16 h-16 flex-shrink-0 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/30">
@@ -383,6 +420,11 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
                 <div class="p-8">
                     <input id="login-email" placeholder="E-mail" class="input-pet mb-3">
                     <input id="login-senha" type="password" placeholder="Senha" class="input-pet mb-6">
+                    <div class="w-full text-right mt-2 mb-4">
+                        <a href="#" onclick="mostrarPopup('Recuperar Senha', 'Entre em contato com o administrador da clínica para redefinir sua senha.'); return false;" class="text-sm text-blue-500 hover:text-blue-700 font-semibold transition-colors">
+                            Esqueci minha senha
+                        </a>
+                    </div>
                     <button onclick="efetuarLogin()" class="w-full btn-principal py-3 rounded-xl font-bold text-lg">Entrar no Painel</button>
                 </div>
             </div>
