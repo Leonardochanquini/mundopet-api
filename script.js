@@ -6,8 +6,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Se for outro provedor, altere aqui
     auth: {
-        user: 'mundo10pet@gmail.com', // Coloque o e-mail que vai disparar as mensagens
-        pass: 'hhkt sbzx aetw rfxg' // No Gmail, você precisa gerar uma "Senha de Aplicativo" nas configurações de segurança
+        user: 'juliacarvalho.mundo10pet@gmail.com', // Coloque o e-mail que vai disparar as mensagens
+        pass: 'qvta yswv vnxp muxj' // No Gmail, você precisa gerar uma "Senha de Aplicativo" nas configurações de segurança
     }
 });
 
@@ -188,23 +188,28 @@ app.post('/api/login', (req, res) => {
 app.post('/api/assinatura-completa', async (req, res) => {
     const { clinica, colaboradores } = req.body;
 
-    // Trava: Verifica se o formato do e-mail do admin é válido
     if (!validarEmail(clinica.emailAdmin)) {
         return res.status(400).json({ error: "O e-mail do administrador é inválido." });
     }
 
-    db.run(`INSERT INTO clinicas (nome, cnpj, telefone) VALUES (?, ?, ?)`, [clinica.nome, clinica.cnpj, clinica.telefone], function(err) {
+    // 1. Tenta inserir a clínica no banco
+    db.run(`INSERT INTO clinicas (nome, cnpj, telefone) VALUES (?, ?, ?)`, [clinica.nome, clinica.cnpj || null, clinica.telefone], function(err) {
         if (err) {
-            console.error("Erro real no banco de dados:", err);
-            return res.status(400).json({ error: "Falha no banco de dados. Detalhe: " + err.message });
+            return res.status(400).json({ error: "Este CNPJ já está cadastrado. Se acabou de clicar, aguarde o sistema carregar." });
         }
         
         const clinicaId = this.lastID;
         
+        // 2. Tenta inserir o usuário
         db.run(`INSERT INTO usuarios (clinic_id, nome, cpf, email, senha, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
-        [clinicaId, 'Admin Master', '', clinica.emailAdmin, clinica.senhaAdmin, 'Administrador', 'Ativo'], async function(err) {
+        [clinicaId, 'Admin Master', '', clinica.emailAdmin, clinica.senhaAdmin, 'Administrador', 'Ativo'], async function(errUser) {
             
-            // Dispara e-mail para o administrador
+            // CORREÇÃO CRÍTICA: Se o e-mail já existir, desfazemos a criação da clínica acima para não perder o CNPJ
+            if (errUser) {
+                db.run(`DELETE FROM clinicas WHERE id = ?`, [clinicaId]); 
+                return res.status(400).json({ error: "O e-mail informado já está em uso por outra conta." });
+            }
+
             await enviarEmailContaCriada(clinica.emailAdmin, 'Admin Master', 'Administrador', '');
 
             if(colaboradores && colaboradores.length > 0) {
@@ -212,7 +217,6 @@ app.post('/api/assinatura-completa', async (req, res) => {
                 for (const c of colaboradores) {
                     if (validarEmail(c.email)) {
                         stmt.run([clinicaId, c.nome, c.cpf, c.email, '123456', c.cargo, 'Ativo', c.especialidade || null]);
-                        // Dispara e-mail para cada colaborador extra cadastrado
                         await enviarEmailContaCriada(c.email, c.nome, c.cargo, c.cpf);
                     }
                 }
@@ -220,7 +224,6 @@ app.post('/api/assinatura-completa', async (req, res) => {
             }
 
             registrarAuditoria(clinicaId, 'Sistema', 'Clínica cadastrada e ambiente inicializado no sistema.');
-
             res.json({ success: true, message: "Sistema ativado com sucesso!" });
         });
     });
