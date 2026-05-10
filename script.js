@@ -67,7 +67,6 @@ db.serialize(() => {
         tipos_animais TEXT,
         cargos TEXT
     )`)
-});
 
     db.run(`CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -158,6 +157,7 @@ db.serialize(() => {
         prescricao TEXT,
         FOREIGN KEY (clinic_id) REFERENCES clinicas(id)
     )`);
+    });
 
 // --- FUNÇÃO INTERNA DE AUDITORIA ---
 function registrarAuditoria(clinic_id, usuario, acao) {
@@ -194,7 +194,10 @@ app.post('/api/assinatura-completa', async (req, res) => {
     }
 
     db.run(`INSERT INTO clinicas (nome, cnpj, telefone) VALUES (?, ?, ?)`, [clinica.nome, clinica.cnpj, clinica.telefone], function(err) {
-        if (err) return res.status(400).json({ error: "CNPJ já cadastrado ou erro no banco." });
+        if (err) {
+            console.error("Erro real no banco de dados:", err);
+            return res.status(400).json({ error: "Falha no banco de dados. Detalhe: " + err.message });
+        }
         
         const clinicaId = this.lastID;
         
