@@ -2,7 +2,47 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Se for outro provedor, altere aqui
+    auth: {
+        user: 'mundo10pet@gmail.com', // Coloque o e-mail que vai disparar as mensagens
+        pass: 'hhkt sbzx aetw rfxg' // No Gmail, você precisa gerar uma "Senha de Aplicativo" nas configurações de segurança
+    }
+});
 
+// Função para validar se o e-mail tem um formato real
+function validarEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+// Função que envia o e-mail com os dados (menos a senha)
+async function enviarEmailContaCriada(destinatario, nome, role, cpf) {
+    const mailOptions = {
+        from: 'Mundo Pet <SEU_EMAIL_AQUI@gmail.com>', // Mesmo e-mail configurado acima
+        to: destinatario,
+        subject: 'Sua conta no Mundo Pet foi criada!',
+        html: `
+            <h2>Olá, ${nome}!</h2>
+            <p>Sua conta no sistema <strong>Mundo Pet</strong> foi criada com sucesso.</p>
+            <h3>Suas Informações:</h3>
+            <ul>
+                <li><strong>Nome:</strong> ${nome}</li>
+                <li><strong>E-mail:</strong> ${destinatario}</li>
+                <li><strong>CPF:</strong> ${cpf || 'Não informado'}</li>
+                <li><strong>Cargo/Perfil:</strong> ${role}</li>
+            </ul>
+            <p><em>Por questões de segurança, sua senha não é exibida neste e-mail.</em></p>
+            <p>Seja bem-vindo(a) à nossa plataforma!</p>
+        `
+    };
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.error("Erro ao enviar e-mail:", error);
+    }
+}
 const app = express();
 const port = process.env.PORT || 8080;
 const SECRET_KEY = "MundoPet_Security_2026_PIM";
@@ -145,8 +185,13 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-app.post('/api/assinatura-completa', (req, res) => {
+app.post('/api/assinatura-completa', async (req, res) => {
     const { clinica, colaboradores } = req.body;
+
+    // Trava: Verifica se o formato do e-mail do admin é válido
+    if (!validarEmail(clinica.emailAdmin)) {
+        return res.status(400).json({ error: "O e-mail do administrador é inválido." });
+    }
 
     db.run(`INSERT INTO clinicas (nome, cnpj, telefone) VALUES (?, ?, ?)`, [clinica.nome, clinica.cnpj, clinica.telefone], function(err) {
         if (err) return res.status(400).json({ error: "CNPJ já cadastrado ou erro no banco." });
@@ -154,22 +199,29 @@ app.post('/api/assinatura-completa', (req, res) => {
         const clinicaId = this.lastID;
         
         db.run(`INSERT INTO usuarios (clinic_id, nome, cpf, email, senha, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)`, 
-        [clinicaId, 'Admin Master', '', clinica.emailAdmin, clinica.senhaAdmin, 'Administrador', 'Ativo'], function(err) {
+        [clinicaId, 'Admin Master', '', clinica.emailAdmin, clinica.senhaAdmin, 'Administrador', 'Ativo'], async function(err) {
             
+            // Dispara e-mail para o administrador
+            await enviarEmailContaCriada(clinica.emailAdmin, 'Admin Master', 'Administrador', '');
+
             if(colaboradores && colaboradores.length > 0) {
                 const stmt = db.prepare(`INSERT INTO usuarios (clinic_id, nome, cpf, email, senha, role, status, especialidade) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
-                colaboradores.forEach(c => stmt.run([clinicaId, c.nome, c.cpf, c.email, '123456', c.cargo, 'Ativo', c.especialidade || null]));
+                for (const c of colaboradores) {
+                    if (validarEmail(c.email)) {
+                        stmt.run([clinicaId, c.nome, c.cpf, c.email, '123456', c.cargo, 'Ativo', c.especialidade || null]);
+                        // Dispara e-mail para cada colaborador extra cadastrado
+                        await enviarEmailContaCriada(c.email, c.nome, c.cargo, c.cpf);
+                    }
+                }
                 stmt.finalize();
             }
 
-            // O ESTOQUE COMEÇA VAZIO (Removida a inserção automática de itens padrão)
             registrarAuditoria(clinicaId, 'Sistema', 'Clínica cadastrada e ambiente inicializado no sistema.');
 
             res.json({ success: true, message: "Sistema ativado com sucesso!" });
         });
     });
 });
-
 // --- ROTA DE AUDITORIA (Somente Leitura) ---
 app.get('/api/auditoria/:clinica_id', (req, res) => {
     db.all(`SELECT data_hora, usuario, acao FROM auditoria WHERE clinic_id = ? ORDER BY id DESC`, [req.params.clinica_id], (err, rows) => {
@@ -182,13 +234,22 @@ app.get('/api/auditoria/:clinica_id', (req, res) => {
 
 app.post('/api/colaborador', (req, res) => {
     const { nome, cpf, email, senha, cargo, clinica_id, especialidade } = req.body;
+    
+    // Trava: Verifica se o e-mail do novo funcionário é válido
+    if (!validarEmail(email)) {
+        return res.status(400).json({ error: "O e-mail fornecido é inválido." });
+    }
+
     db.get(`SELECT email FROM usuarios WHERE email = ?`, [email], (err, row) => {
         if (err) return res.status(500).json({ error: "Erro interno no servidor." });
         if (row) return res.status(400).json({ error: "E-mail já cadastrado no sistema." });
         
         db.run(`INSERT INTO usuarios (clinic_id, nome, cpf, email, senha, role, status, especialidade) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
-        [clinica_id, nome, cpf, email, senha, cargo, 'Ativo', especialidade || null], function(err) {
+        [clinica_id, nome, cpf, email, senha, cargo, 'Ativo', especialidade || null], async function(err) {
             
+            // Dispara e-mail para o novo colaborador
+            await enviarEmailContaCriada(email, nome, cargo, cpf);
+
             registrarAuditoria(clinica_id, req.headers['x-usuario-nome'] || 'Desconhecido', `Cadastrou o colaborador: ${nome} (${cargo})`);
             res.json({ success: true, message: "Colaborador cadastrado com sucesso!", id: this.lastID });
         });
