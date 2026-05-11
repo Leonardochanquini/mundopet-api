@@ -56,6 +56,8 @@ const db = new sqlite3.Database('./mundopet_persistente_v2.db');
 db.serialize(() => {
     console.log("🛠️  Configurando banco de dados...");
 
+    db.run(`CREATE TABLE IF NOT EXISTS especialidades (id INTEGER PRIMARY KEY AUTOINCREMENT, clinic_id TEXT, nome TEXT)`);
+
     db.run(`CREATE TABLE IF NOT EXISTS clinicas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
@@ -393,7 +395,8 @@ app.put('/api/clinica/:id', (req, res) => {
     const { nome, cnpj, telefone, endereco, email_contato, categorias_prontuario, tipos_animais, cargos } = req.body;
     
     db.run(`UPDATE clinicas SET nome = ?, cnpj = ?, telefone = ?, endereco = ?, email_contato = ?, categorias_prontuario = ?, tipos_animais = ?, cargos = ? WHERE id = ?`, 
-    [nome, cnpj, telefone, endereco, email_contato, categorias_prontuario, tipos_animais, cargos, req.params.id], function(err) {
+    [nome, cnpj, telefone, endereco, email_contato, categorias_prontuario, tipos_animais, cargos, req.params.id], 
+    function(err) {
         if (err) return res.status(500).json({ error: "Erro ao atualizar configurações." });
         
         registrarAuditoria(req.params.id, req.headers['x-usuario-nome'] || 'Desconhecido', `Alterou as configurações/dados globais da clínica.`);
@@ -483,6 +486,22 @@ app.put('/api/agenda/status/:id', (req, res) => {
     db.run(`UPDATE agenda SET status = ? WHERE id = ?`, [status, req.params.id], function(err) {
         if (err) return res.status(500).json({ error: "Erro ao atualizar status na agenda." });
         res.json({ success: true });
+    });
+});
+
+// --- ROTAS DE ESPECIALIDADES ---
+app.get('/api/especialidades/:clinica_id', (req, res) => {
+    db.all(`SELECT * FROM especialidades WHERE clinic_id = ? ORDER BY nome ASC`, [req.params.clinica_id], (err, rows) => {
+        if (err) return res.status(500).json({ error: "Erro ao buscar especialidades." });
+        res.json(rows);
+    });
+});
+
+app.post('/api/especialidades', (req, res) => {
+    const { clinic_id, nome } = req.body;
+    db.run(`INSERT INTO especialidades (clinic_id, nome) VALUES (?, ?)`, [clinic_id, nome], function(err) {
+        if (err) return res.status(500).json({ error: "Erro ao adicionar especialidade." });
+        res.json({ success: true, id: this.lastID });
     });
 });
 

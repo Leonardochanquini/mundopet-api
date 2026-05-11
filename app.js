@@ -17,20 +17,32 @@
         let transacoes = [];
         let agendamentos = [];
         let prontuarios = [];
+        let especialidadesClinica = [];
 
         async function sincronizarDados() {
             if (!clinicaId) return;
             try {
                 // 1. Adicionado o fetch de clientes na mesma chamada
-                const [colabRes, transRes, estRes, agendaRes, pronRes, cliRes] = await Promise.all([
+                const [colabRes, transRes, estRes, agendaRes, pronRes, cliRes, espRes, clinicaRes] = await Promise.all([
                     fetch(`/api/colaboradores/${clinicaId}`),
                     fetch(`/api/transacoes/${clinicaId}`),
                     fetch(`/api/estoque/${clinicaId}`),
                     fetch(`/api/agenda/${clinicaId}`).catch(() => null),
                     fetch(`/api/prontuarios/${clinicaId}`).catch(() => null),
-                    fetch(`/api/clientes/${clinicaId}`).catch(() => null)
+                    fetch(`/api/clientes/${clinicaId}`).catch(() => null),
+                    fetch(`/api/especialidades/${clinicaId}`).catch(() => null),
+                    fetch(`/api/clinica/${clinicaId}`).catch(() => null)
                 ]);
 
+                if (espRes && espRes.ok) especialidadesClinica = await espRes.json();
+                if (clinicaRes && clinicaRes.ok) {
+                    const dados = await clinicaRes.json();
+                    clinicaLogada.cargos = dados.cargos;
+                    clinicaLogada.tipos_animais = dados.tipos_animais;
+                    clinicaLogada.categorias_prontuario = dados.categorias_prontuario;
+}                   
+                atualizarSelectsEspecialidades();
+                atualizarSelectsConfiguracoes();
                 let mudouRecepcao = false;
 
                 if (colabRes && colabRes.ok) equipe = await colabRes.json();
@@ -1729,14 +1741,19 @@
             const novosCargos = document.getElementById('config-cargos-hidden').value;
 
             try {
+                // Rota corrigida para o singular, igualzinho ao seu script.js
                 const res = await fetch(`/api/clinica/${clinicaLogada.id}`, {
                     method: 'PUT',
                     headers: getAuthHeaders(),
                     body: JSON.stringify({ 
-                        nome: novoNome, cnpj: novoCNPJ, telefone: novoTelefone, 
-                        endereco: novoEndereco, email_contato: novoEmail, 
-                        logotipo: novoLogo, // <-- ADICIONADO AQUI
-                        categorias_prontuario: novasCategorias, tipos_animais: novosAnimais, cargos: novosCargos 
+                        nome: novoNome, 
+                        cnpj: novoCNPJ, 
+                        telefone: novoTelefone, 
+                        endereco: novoEndereco, 
+                        email_contato: novoEmail, 
+                        categorias_prontuario: novasCategorias, 
+                        tipos_animais: novosAnimais, 
+                        cargos: novosCargos 
                     })
                 });
 
@@ -2622,3 +2639,64 @@ window.abrirModalProntuarioVinculado = function() {
 function rolarParaInformacoes() {
     document.getElementById('secao-informacoes').scrollIntoView({ behavior: 'smooth' });
 }
+
+window.atualizarSelectsEspecialidades = function() {
+    // Array com os IDs dos selects de especialidade no seu HTML (Adicione os IDs corretos aqui)
+    const selectsEspecialidades = [
+        document.getElementById('select-especialidade-equipe'), // ID do select no modal de Equipe
+        document.getElementById('select-especialidade-recepcao') // ID do select na Recepção
+    ];
+
+    selectsEspecialidades.forEach(select => {
+        if (select) {
+            const valorAtual = select.value; // Salva o valor selecionado caso esteja editando
+            select.innerHTML = '<option value="">Selecione uma Especialidade...</option>';
+            especialidadesClinica.forEach(esp => {
+                const option = document.createElement('option');
+                option.value = esp.nome;
+                option.textContent = esp.nome;
+                select.appendChild(option);
+            });
+            if (valorAtual) select.value = valorAtual; // Restaura a seleção
+        }
+    });
+};
+
+async function salvarNovaEspecialidade(nomeEspecialidade) {
+    await fetch('/api/especialidades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clinic_id: clinicaId, nome: nomeEspecialidade })
+    });
+    await sincronizarDados(); // Isso recarrega a lista do banco e já atualiza os selects de toda a tela.
+}
+
+window.atualizarSelectsConfiguracoes = function() {
+    if (!clinicaLogada) return;
+
+    // Lógica para transformar o texto do banco (ex: "Cão, Gato") em options do <select>
+    function atualizar(idsArray, stringDoBanco) {
+        if (!stringDoBanco) return;
+        const opcoes = stringDoBanco.split(',').map(i => i.trim()).filter(i => i);
+        
+        idsArray.forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
+                const valorSalvo = select.value; // Preserva o que o usuário já tinha clicado
+                select.innerHTML = '<option value="">Selecione...</option>';
+                opcoes.forEach(op => {
+                    const tag = document.createElement('option');
+                    tag.value = op;
+                    tag.innerText = op;
+                    select.appendChild(tag);
+                });
+                if (valorSalvo) select.value = valorSalvo;
+            }
+        });
+    }
+
+    // ATENÇÃO: Troque os nomes entre aspas simples pelos IDs EXATOS dos <select> no seu HTML
+    atualizar(['id-do-select-de-cargo'], clinicaLogada.cargos);
+    atualizar(['id-do-select-de-animal-recepcao', 'id-do-select-de-animal-cliente'], clinicaLogada.tipos_animais);
+    atualizar(['id-do-select-de-categoria-prontuario'], clinicaLogada.categorias_prontuario);
+};
