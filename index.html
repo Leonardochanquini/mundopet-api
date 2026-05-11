@@ -144,6 +144,34 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
     .no-print { display: none !important; }
     .card { box-shadow: none; border: 1px solid #ddd; }
 }
+/* --- RESPONSIVIDADE MOBILE (CELULARES) --- */
+@media (max-width: 768px) {
+    /* 1. Transforma o layout do painel de linha para coluna */
+    #app-container { flex-direction: column !important; }
+    
+    /* 2. Menu lateral vira menu superior com rolagem horizontal para não ocupar a tela toda */
+    aside { width: 100% !important; padding: 15px !important; height: auto !important; flex-direction: column !important; }
+    #clinica-logo-container { margin-bottom: 10px !important; justify-content: center; }
+    #menu-lateral { display: flex !important; flex-direction: row !important; overflow-x: auto; padding-bottom: 5px; gap: 5px; }
+    #menu-lateral > div { margin-top: 0 !important; } /* Anula o distanciamento vertical original */
+    .sidebar-item { white-space: nowrap; padding: 8px 12px; font-size: 14px; }
+    
+    /* 3. Área de conteúdo principal ganha espaçamento adequado para celular */
+    main { padding: 15px !important; }
+    
+    /* 4. Cabeçalho das páginas (Título e Botões quebram linha) */
+    main header { flex-direction: column !important; align-items: flex-start !important; gap: 15px; }
+    #header-actions { width: 100%; flex-wrap: wrap; gap: 8px !important; justify-content: space-between; }
+    #header-actions > * { flex: 1 1 45%; font-size: 13px !important; }
+    
+    /* 5. Tabelas ganham barra de rolagem horizontal (evita quebrar e vazar do Card) */
+    .card { padding: 15px !important; }
+    .card table { display: block; width: 100%; overflow-x: auto; white-space: nowrap; }
+    
+    /* 6. Modais e Checkout ocupam a tela toda e viram coluna única */
+    .modal-content { width: 95% !important; padding: 20px !important; margin: 10px; max-height: 85vh; }
+    .modal-content .grid-cols-2, .modal-content .grid-cols-3, #etapa-3 .grid-cols-2 { grid-template-columns: 1fr !important; gap: 10px !important; }
+}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>

@@ -6,8 +6,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Se for outro provedor, altere aqui
     auth: {
-        user: 'juliacarvalho.mundo10pet@gmail.com', // Coloque o e-mail que vai disparar as mensagens
-        pass: 'qvta yswv vnxp muxj' // No Gmail, você precisa gerar uma "Senha de Aplicativo" nas configurações de segurança
+        user: 'mundo10pet@gmail.com', // Coloque o e-mail que vai disparar as mensagens
+        pass: 'vpqq yxbm hwak ybxe' // No Gmail, você precisa gerar uma "Senha de Aplicativo" nas configurações de segurança
     }
 });
 
