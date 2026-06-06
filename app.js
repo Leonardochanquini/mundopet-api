@@ -1,4 +1,3 @@
-<<<<<<< HEAD
        const API_BASE_URL = window.location.origin;
        let roleAtiva = 'admin';
        let filtroPeriodo = 'Mês Atual'; 
@@ -2578,7 +2577,6 @@ window.abrirModalProntuarioVinculado = function() {
         }
     }, 50);
 };
-=======
        const API_BASE_URL = window.location.origin;
        let roleAtiva = 'admin';
        let filtroPeriodo = 'Mês Atual'; 
@@ -5281,4 +5279,3 @@ window.atualizarSelectsConfiguracoes = function() {
     atualizar(['id-do-select-de-animal-recepcao', 'id-do-select-de-animal-cliente'], clinicaLogada.tipos_animais);
     atualizar(['id-do-select-de-categoria-prontuario'], clinicaLogada.categorias_prontuario);
 };
->>>>>>> f85549473e1f94e5364c38bb6611de8aa50b12db
