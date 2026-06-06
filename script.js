@@ -287,11 +287,15 @@ app.post('/api/estoque', (req, res) => {
         registrarAuditoria(clinic_id, req.headers['x-usuario-nome'] || 'Desconhecido', `Cadastrou novo item no estoque: ${nome} (Lote: ${lote}, Qtd: ${qtd})`);
 
         if (gerarTransacao && valor > 0) {
+            // 1. ADICIONADO: Calcula o valor total multiplicando valor unitário pela quantidade
+            const valorTotal = parseFloat(valor) * parseInt(qtd, 10);
+
             const dataAtual = new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
             const descTransacao = `Compra de Estoque: ${nome} (Qtd: ${qtd} | Lote: ${lote})`;
             
+            // 2. ALTERADO: Troca 'valor' por 'valorTotal' no array de inserção do banco
             db.run(`INSERT INTO transacoes (clinic_id, data, descricao, categoria, valor, tipo, metodo) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [clinic_id, dataAtual, descTransacao, 'Medicamentos', valor, 'saida', 'Pix'], function(errTrans) {
+            [clinic_id, dataAtual, descTransacao, 'Medicamentos', valorTotal, 'saida', 'Pix'], function(errTrans) {
                 if (errTrans) console.error("Erro ao gerar transação automática:", errTrans);
                 
                 registrarAuditoria(clinic_id, 'Sistema (Automático)', `Gerou despesa automática referente à aquisição do estoque de ${nome}`);
