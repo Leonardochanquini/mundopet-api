@@ -443,10 +443,6 @@ app.listen(port, () => {
     console.log(`🚀 Servidor Mundo Pet rodando em http://localhost:${port}`);
 });
 
-const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Se for outro provedor, altere aqui
