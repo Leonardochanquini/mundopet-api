@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -443,7 +442,7 @@ app.post('/api/prontuarios', (req, res) => {
 app.listen(port, () => {
     console.log(`🚀 Servidor Mundo Pet rodando em http://localhost:${port}`);
 });
-=======
+
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -972,4 +971,3 @@ app.post('/api/prontuarios', (req, res) => {
 app.listen(port, () => {
     console.log(`🚀 Servidor Mundo Pet rodando em http://localhost:${port}`)
 });
->>>>>>> f85549473e1f94e5364c38bb6611de8aa50b12db
