@@ -1661,8 +1661,13 @@
                     colaboradoresCheckout = [];
                     irPara('tela-login');
                 } else {
-                    mostrarPopup('❌ Erro no Cadastro', result.error || 'Erro ao processar cadastro.');
-                }
+                    mostrarPopup('ℹ️ Aviso', 'Este CNPJ já possui cadastro em nosso sistema.');
+    
+                    const btnPopupOk = document.querySelector('#popup-container .popup-button');
+                    btnPopupOk.onclick = function() {
+                        fecharPopup();
+                        window.location.reload(); // Recarrega a página, forçando a volta para a tela inicial
+                    }};
             } catch (error) {
                 mostrarPopup('🔌 Erro', 'Verifique se o servidor está rodando na porta 8080.');
             }

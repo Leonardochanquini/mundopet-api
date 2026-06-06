@@ -1,0 +1,23 @@
+config:
+  target: "https://mundopet-api-kcg9.onrender.com/"
+  phases:
+    - duration: 60
+      arrivalRate: 10 # Simula 10 usuários por segundo durante 1 minuto
+scenarios:
+  - name: "Teste Backend - Financeiro"
+    weight: 2
+    flow:
+      - get:
+          url: "/api/transacoes/1" # Mude o 1 para o seu ID de clinicaId
+
+  - name: "Teste Backend - Equipe"
+    weight: 1
+    flow:
+      - get:
+          url: "/api/colaboradores/1" # Mude o 1 para o seu ID
+
+  - name: "Teste Backend - Prontuarios"
+    weight: 1
+    flow:
+      - get:
+          url: "/api/prontuarios/1" # Mude o 1 para o seu ID

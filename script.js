@@ -149,7 +149,9 @@ app.post('/api/assinatura-completa', (req, res) => {
     const { clinica, colaboradores } = req.body;
 
     db.run(`INSERT INTO clinicas (nome, cnpj, telefone) VALUES (?, ?, ?)`, [clinica.nome, clinica.cnpj, clinica.telefone], function(err) {
-        if (err) return res.status(400).json({ error: "CNPJ já cadastrado ou erro no banco." });
+        if (err) {
+            return res.status(400).json({ error: "CNPJ já cadastrado." });
+        }
         
         const clinicaId = this.lastID;
         
