@@ -182,6 +182,14 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
     #img-sistema-exibicao.fade-out {
         opacity: 0;
     }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        overflow-x: hidden; /* Isso corta qualquer rebarba acidental */
+    }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -346,7 +354,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
                 </div>
     </div>
 </div>
-</div> <div id="secao-seguranca" class="w-screen bg-gray-900 py-8 px-6 border-t border-gray-800">
+</div> <div id="secao-seguranca" class="w-full bg-gray-900 py-8 px-6 border-t border-gray-800">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-center gap-6 text-center md:text-left">
             <div class="w-16 h-16 flex-shrink-0 bg-blue-500/10 rounded-full flex items-center justify-center border border-blue-500/30">
                 <i class="fa-solid fa-shield-check text-3xl text-blue-400"></i>
