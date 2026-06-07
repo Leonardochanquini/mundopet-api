@@ -48,19 +48,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-    // Lógica do FAQ - FAQ Accordion
-    const faqQuestions = document.querySelectorAll('.faq-question');
-    faqQuestions.forEach(button => {
-        button.addEventListener('click', () => {
-            const answer = button.nextElementSibling;
-            // Alterna a classe 'hidden' do Tailwind
-            answer.classList.toggle('hidden');
-            
-            // Opcional: muda o sinal de + para -
-            const span = button.querySelector('span');
-            span.textContent = answer.classList.contains('hidden') ? '+' : '-';
-        });
+    // Lógica do Accordion FAQ
+document.querySelectorAll('.faq-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const content = btn.nextElementSibling;
+        const icon = btn.querySelector('i');
+        
+        // Alterna a altura para exibir ou ocultar
+        if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+            icon.style.transform = 'rotate(180deg)';
+        }
     });
+});
 });
 
 function iniciarRotacaoImagens() {
