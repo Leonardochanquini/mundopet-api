@@ -37,12 +37,8 @@
                 if (espRes && espRes.ok) especialidadesClinica = await espRes.json();
                 if (clinicaRes && clinicaRes.ok) {
                     const dados = await clinicaRes.json();
-                    clinicaLogada.cargos = dados.cargos;
-                    clinicaLogada.tipos_animais = dados.tipos_animais;
-                    clinicaLogada.categorias_prontuario = dados.categorias_prontuario;
 }                   
                 atualizarSelectsEspecialidades();
-                atualizarSelectsConfiguracoes();
                 let mudouRecepcao = false;
 
                 if (colabRes && colabRes.ok) equipe = await colabRes.json();
@@ -200,9 +196,6 @@
                             clinicaLogada.telefone = clinicaDados.telefone || '';
                             clinicaLogada.endereco = clinicaDados.endereco || '';
                             clinicaLogada.email_contato = clinicaDados.email_contato || '';
-                            clinicaLogada.categorias_prontuario = clinicaDados.categorias_prontuario || '';
-                            clinicaLogada.tipos_animais = clinicaDados.tipos_animais || '';
-                            clinicaLogada.cargos = clinicaDados.cargos || '';
                         }
 
                         const colabRes = await fetch(`/api/colaboradores/${clinicaId}`);
@@ -413,52 +406,7 @@
                                     <label class="text-xs font-bold text-gray-500 mb-1 block">E-mail de Contato</label>
                                     <input id="config-email-contato" value="${clinicaLogada.email_contato || ''}" class="input-pet">
                                 </div>
-
-                                <h4 class="text-lg font-bold mt-6 mb-2 border-b pb-1">Personalização do Sistema</h4>
-
-                                <div>
-                                    <label class="text-xs font-bold text-gray-500 mb-1 block">Categorias de Prontuários</label>
-                                    <div class="flex gap-2 mb-2">
-                                        <select id="modal-select-categoria-prontuario" class="input-pet flex-grow"></select>
-                                        <button onclick="removerOpcao('config-categorias-prontuario-select', 'config-categorias-prontuario-hidden')" class="bg-red-100 text-red-600 px-3 rounded-lg font-bold hover:bg-red-200">Remover</button>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <input id="nova-categoria-prontuario" placeholder="Nova categoria..." class="input-pet flex-grow">
-                                        <button onclick="adicionarOpcao('nova-categoria-prontuario', 'config-categorias-prontuario-select', 'config-categorias-prontuario-hidden')" class="bg-green-100 text-green-600 px-3 rounded-lg font-bold hover:bg-green-200">Adicionar</button>
-                                    </div>
-                                    <input type="hidden" id="config-categorias-prontuario-hidden" value="${clinicaLogada.categorias_prontuario || ''}">
-                                </div>
-
-                                <div class="mt-4">
-                                    <label class="text-xs font-bold text-gray-500 mb-1 block">Tipos de Animais Atendidos</label>
-                                    <div class="flex gap-2 mb-2">
-                                        <select id="modal-select-animal" class="input-pet flex-grow"></select>
-                                        <button onclick="removerOpcao('config-tipos-animais-select', 'config-tipos-animais-hidden')" class="bg-red-100 text-red-600 px-3 rounded-lg font-bold hover:bg-red-200">Remover</button>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <input id="novo-tipo-animal" placeholder="Novo tipo..." class="input-pet flex-grow">
-                                        <button onclick="adicionarOpcao('novo-tipo-animal', 'config-tipos-animais-select', 'config-tipos-animais-hidden')" class="bg-green-100 text-green-600 px-3 rounded-lg font-bold hover:bg-green-200">Adicionar</button>
-                                    </div>
-                                    <input type="hidden" id="config-tipos-animais-hidden" value="${clinicaLogada.tipos_animais || ''}">
-                                </div>
-
-                                <div class="mt-4">
-                                    <label class="text-xs font-bold text-gray-500 mb-1 block">Cargos da Equipe</label>
-                                    <div class="flex gap-2 mb-2">
-                                        <select id="modal-select-cargo" class="input-pet flex-grow"></select>
-                                        <button onclick="removerOpcao('config-cargos-select', 'config-cargos-hidden')" class="bg-red-100 text-red-600 px-3 rounded-lg font-bold hover:bg-red-200">Remover</button>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <input id="novo-cargo" placeholder="Novo cargo..." class="input-pet flex-grow">
-                                        <button onclick="adicionarOpcao('novo-cargo', 'config-cargos-select', 'config-cargos-hidden')" class="bg-green-100 text-green-600 px-3 rounded-lg font-bold hover:bg-green-200">Adicionar</button>
-                                    </div>
-                                    <input type="hidden" id="config-cargos-hidden" value="${clinicaLogada.cargos || ''}">
-                                </div>
-                                
-                                <button onclick="salvarConfiguracoesClinica()" class="btn-principal px-6 py-2 rounded-xl font-bold mt-4">Salvar Configurações</button>
-                            </div>
-                        </div>
-                        <div class="card">
+                        <div class="card"> 
                             <h3 class="text-xl font-bold mb-4 border-b pb-2">Segurança da Conta</h3>
                             <div class="space-y-4">
                                 <div>
@@ -1751,9 +1699,6 @@
                         telefone: novoTelefone, 
                         endereco: novoEndereco, 
                         email_contato: novoEmail, 
-                        categorias_prontuario: novasCategorias, 
-                        tipos_animais: novosAnimais, 
-                        cargos: novosCargos 
                     })
                 });
 
@@ -2671,34 +2616,4 @@ async function salvarNovaEspecialidade(nomeEspecialidade) {
         body: JSON.stringify({ clinic_id: clinicaId, nome: nomeEspecialidade })
     });
     await sincronizarDados(); // Isso recarrega a lista do banco e já atualiza os selects de toda a tela.
-}
-
-window.atualizarSelectsConfiguracoes = function() {
-    if (!clinicaLogada) return;
-
-    // Lógica para transformar o texto do banco (ex: "Cão, Gato") em options do <select>
-    function atualizar(idsArray, stringDoBanco) {
-        if (!stringDoBanco) return;
-        const opcoes = stringDoBanco.split(',').map(i => i.trim()).filter(i => i);
-        
-        idsArray.forEach(id => {
-            const select = document.getElementById(id);
-            if (select) {
-                const valorSalvo = select.value; // Preserva o que o usuário já tinha clicado
-                select.innerHTML = '<option value="">Selecione...</option>';
-                opcoes.forEach(op => {
-                    const tag = document.createElement('option');
-                    tag.value = op;
-                    tag.innerText = op;
-                    select.appendChild(tag);
-                });
-                if (valorSalvo) select.value = valorSalvo;
-            }
-        });
-    }
-
-    // Liga as configurações globais com os selects de todo o sistema
-    atualizar(['modal-select-cargo'], clinicaLogada.cargos);
-    atualizar(['modal-select-animal'], clinicaLogada.tipos_animais);
-    atualizar(['modal-select-tipo-agenda', 'modal-select-categoria-prontuario'], clinicaLogada.categorias_prontuario);
 };

@@ -329,9 +329,9 @@ app.delete('/api/estoque/:id', (req, res) => {
 // --- ROTAS DE CONFIGURAÇÕES / CLÍNICA ---
 
 app.put('/api/clinica/:id', (req, res) => {
-    const { nome, cnpj, telefone, endereco, email_contato, categorias_prontuario, tipos_animais, cargos } = req.body;
+    const { nome, cnpj, telefone, endereco, email_contato} = req.body;
     
-    db.run(`UPDATE clinicas SET nome = ?, cnpj = ?, telefone = ?, endereco = ?, email_contato = ?, categorias_prontuario = ?, tipos_animais = ?, cargos = ? WHERE id = ?`, 
+    db.run(`UPDATE clinicas SET nome = ?, cnpj = ?, telefone = ?, endereco = ?, email_contato = ? WHERE id = ?`, 
     [nome, cnpj, telefone, endereco, email_contato, categorias_prontuario, tipos_animais, cargos, req.params.id], function(err) {
         if (err) return res.status(500).json({ error: "Erro ao atualizar configurações." });
         
