@@ -48,6 +48,19 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+    // Lógica do FAQ - FAQ Accordion
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    faqQuestions.forEach(button => {
+        button.addEventListener('click', () => {
+            const answer = button.nextElementSibling;
+            // Alterna a classe 'hidden' do Tailwind
+            answer.classList.toggle('hidden');
+            
+            // Opcional: muda o sinal de + para -
+            const span = button.querySelector('span');
+            span.textContent = answer.classList.contains('hidden') ? '+' : '-';
+        });
+    });
 });
 
 function iniciarRotacaoImagens() {
