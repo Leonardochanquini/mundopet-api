@@ -49,3 +49,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+function trocarImagemSistema(caminho) {
+    const imgElement = document.getElementById('img-sistema-exibicao');
+    if (imgElement) {
+        imgElement.src = caminho;
+    }
+}
