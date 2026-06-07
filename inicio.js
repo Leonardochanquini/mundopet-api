@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-ffunction iniciarRotacaoImagens() {
+function iniciarRotacaoImagens() {
     const imgElement = document.getElementById('img-sistema-exibicao');
     
     // Verificação de erro: se não achar a imagem, avisa no console
