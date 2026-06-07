@@ -50,9 +50,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function trocarImagemSistema(caminho) {
+// Função para rotacionar as imagens do "Conheça por Dentro"
+function iniciarRotacaoImagens() {
     const imgElement = document.getElementById('img-sistema-exibicao');
-    if (imgElement) {
-        imgElement.src = caminho;
-    }
+    if (!imgElement) return; // Se não achar o elemento, para a execução
+
+    const imagens = [
+        'assets/visao_de_negocio.png',
+        'assets/recursos_humanos.png',
+        'assets/estoque.png'
+    ];
+
+    let indice = 0;
+
+    setInterval(() => {
+        indice = (indice + 1) % imagens.length;
+        imgElement.src = imagens[indice];
+    }, 3000); // 3000ms = 3 segundos de intervalo
 }
+
+// Chame a função quando o DOM carregar
+document.addEventListener('DOMContentLoaded', iniciarRotacaoImagens);
