@@ -7,9 +7,190 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+    /* Paleta Clean e Moderna */
+    --bg-color: #f8fafc;        /* Off-white/Cinza muito claro para o fundo */
+    --text-color: #334155;      /* Cinza escuro para melhor legibilidade */
+    --text-muted: #64748b;
+    --primary-color: #3b82f6;   /* Azul vibrante profissional */
+    --primary-hover: #2563eb;
+    --secondary-color: #10b981; /* Verde esmeralda */
+    --border-color: #e2e8f0;
+    --card-bg: #ffffff;
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
 
-    <style <link rel="stylesheet" href="style.css"></style>
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--bg-color); 
+    color: var(--text-color);
+    line-height: 1.6; /* Melhoria na legibilidade */
+}
 
+/* Padronização Global de Inputs e Selects */
+input, select, .input-pet { 
+    width: 100%; 
+    padding: 12px 16px; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    outline: none; 
+    color: var(--text-color);
+    background-color: var(--card-bg);
+    transition: all 0.2s ease-in-out;
+    font-family: 'Inter', sans-serif;
+}
+
+input:focus, select:focus, .input-pet:focus { 
+    border-color: var(--primary-color); 
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); 
+}
+
+/* Padronização Global de Botões */
+button {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-principal { 
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color)); 
+    color: white; 
+}
+
+.btn-principal:hover { 
+    opacity: 0.95; 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.25);
+}
+
+/* Atualização dos Cards */
+.card { 
+    background: var(--card-bg); 
+    border-radius: 12px; 
+    box-shadow: var(--shadow-soft); 
+    padding: 24px; 
+    border: 1px solid var(--border-color);
+}
+
+/* Adições para a Tela de Login Split */
+.login-split-container {
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    min-height: 450px; /* Garante uma altura agradável no desktop */
+}
+
+.login-visual-side {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+/* --- MANTIDO DO SEU CÓDIGO ORIGINAL PARA NÃO QUEBRAR O LAYOUT --- */
+.tab-button { flex: 1; padding: 12px; font-weight: bold; border-bottom: 2px solid var(--border-color); cursor: pointer; text-align: center; color: var(--text-muted); transition: 0.2s; }
+.tab-button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background-color: #eff6ff; }
+.sidebar-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    padding: 14px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    color: var(--text-muted); 
+    font-weight: 600; 
+    transition: all 0.2s ease-in-out; 
+}
+
+/* Novo Efeito de Hover Dinâmico */
+.sidebar-item:hover:not(.active) { 
+    background-color: #f1f5f9; /* Fundo cinza bem claro */
+    color: var(--primary-color); 
+    transform: translateX(4px); /* Leve movimento para a direita */
+}
+
+/* Reforço visual no item ativo */
+.sidebar-item.active { 
+    background-color: var(--primary-color); 
+    color: white; 
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25); 
+}
+.btn-voltar { position: absolute; top: 25px; left: 25px; font-weight: 800; color: var(--primary-color); cursor: pointer; z-index: 100; transition: 0.2s; }
+.btn-voltar:hover { color: var(--primary-hover); transform: translateX(-2px); }
+
+.popup-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(2px); }
+.popup-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 16px; padding: 30px; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+.popup-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: var(--text-color); }
+.popup-message { margin-bottom: 1.5rem; color: var(--text-muted); line-height: 1.5; }
+.popup-button { width: 100%; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; border: none; }
+.popup-button-primary { background: var(--primary-color); color: white; }
+.popup-button-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+.etapa-checkout { width: 95%; max-width: 500px; margin: 0 auto; }
+@media (max-width: 640px) {
+    .etapa-checkout { width: 98%; padding: 15px; }
+    .card { padding: 15px; }
+    .popup-content { width: 95%; padding: 20px; }
+}
+
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-color); font-size: 14px; }
+.status-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.02em; }
+.status-badge:hover { opacity: 0.8; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(2px); }
+.modal-content { background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 16px; padding: 30px; position: relative; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+@media print {
+    .no-print { display: none !important; }
+    .card { box-shadow: none; border: 1px solid #ddd; }
+}
+/* --- RESPONSIVIDADE MOBILE (CELULARES) --- */
+@media (max-width: 768px) {
+    /* 1. Transforma o layout do painel de linha para coluna */
+    #app-container { flex-direction: column !important; }
+    
+    /* 2. Menu lateral vira menu superior com rolagem horizontal para não ocupar a tela toda */
+    aside { width: 100% !important; padding: 15px !important; height: auto !important; flex-direction: column !important; }
+    #clinica-logo-container { margin-bottom: 10px !important; justify-content: center; }
+    #menu-lateral { display: flex !important; flex-direction: row !important; overflow-x: auto; padding-bottom: 5px; gap: 5px; }
+    #menu-lateral > div { margin-top: 0 !important; } /* Anula o distanciamento vertical original */
+    .sidebar-item { white-space: nowrap; padding: 8px 12px; font-size: 14px; }
+    
+    /* 3. Área de conteúdo principal ganha espaçamento adequado para celular */
+    main { padding: 15px !important; }
+    
+    /* 4. Cabeçalho das páginas (Título e Botões quebram linha) */
+    main header { flex-direction: column !important; align-items: flex-start !important; gap: 15px; }
+    #header-actions { width: 100%; flex-wrap: wrap; gap: 8px !important; justify-content: space-between; }
+    #header-actions > * { flex: 1 1 45%; font-size: 13px !important; }
+    
+    /* 5. Tabelas ganham barra de rolagem horizontal (evita quebrar e vazar do Card) */
+    .card { padding: 15px !important; }
+    .card table { display: block; width: 100%; overflow-x: auto; white-space: nowrap; }
+    
+    /* 6. Modais e Checkout ocupam a tela toda e viram coluna única */
+    .modal-content { width: 95% !important; padding: 20px !important; margin: 10px; max-height: 85vh; }
+    .modal-content .grid-cols-2, .modal-content .grid-cols-3, #etapa-3 .grid-cols-2 { grid-template-columns: 1fr !important; gap: 10px !important; }
+}
+
+    /* Adicione isso na sua tag <style> */
+    #img-sistema-exibicao {
+        transition: opacity 0.5s ease-in-out;
+        opacity: 1;
+    }
+
+    #img-sistema-exibicao.fade-out {
+        opacity: 0;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        overflow-x: hidden; /* Isso corta qualquer rebarba acidental */
+    }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
@@ -183,8 +364,7 @@
             </p>
         </div>
     </div>
-<div class="lgpd-footer"> 
-   </div>
+
 </body>
 
     <div id="tela-planos" class="hidden h-screen overflow-y-auto flex flex-col items-center justify-start bg-gray-50 relative py-12">
