@@ -419,7 +419,7 @@
                                 <div>
                                     <label class="text-xs font-bold text-gray-500 mb-1 block">Categorias de Prontuários</label>
                                     <div class="flex gap-2 mb-2">
-                                        <select id="config-categorias-prontuario-select" class="input-pet flex-grow"></select>
+                                        <select id="modal-select-categoria-prontuario" class="input-pet flex-grow"></select>
                                         <button onclick="removerOpcao('config-categorias-prontuario-select', 'config-categorias-prontuario-hidden')" class="bg-red-100 text-red-600 px-3 rounded-lg font-bold hover:bg-red-200">Remover</button>
                                     </div>
                                     <div class="flex gap-2">
@@ -432,7 +432,7 @@
                                 <div class="mt-4">
                                     <label class="text-xs font-bold text-gray-500 mb-1 block">Tipos de Animais Atendidos</label>
                                     <div class="flex gap-2 mb-2">
-                                        <select id="config-tipos-animais-select" class="input-pet flex-grow"></select>
+                                        <select id="modal-select-animal" class="input-pet flex-grow"></select>
                                         <button onclick="removerOpcao('config-tipos-animais-select', 'config-tipos-animais-hidden')" class="bg-red-100 text-red-600 px-3 rounded-lg font-bold hover:bg-red-200">Remover</button>
                                     </div>
                                     <div class="flex gap-2">
@@ -445,7 +445,7 @@
                                 <div class="mt-4">
                                     <label class="text-xs font-bold text-gray-500 mb-1 block">Cargos da Equipe</label>
                                     <div class="flex gap-2 mb-2">
-                                        <select id="config-cargos-select" class="input-pet flex-grow"></select>
+                                        <select id="modal-select-cargo" class="input-pet flex-grow"></select>
                                         <button onclick="removerOpcao('config-cargos-select', 'config-cargos-hidden')" class="bg-red-100 text-red-600 px-3 rounded-lg font-bold hover:bg-red-200">Remover</button>
                                     </div>
                                     <div class="flex gap-2">
@@ -2275,6 +2275,8 @@
             document.getElementById('modal-container').style.display = 'flex';
         }
 
+        window.atualizarSelectsConfiguracoes();
+
 window.atualizarVeterinarios = function() {
     const especialidade = document.getElementById('agenda-especialidade').value;
     const selectVet = document.getElementById('agenda-veterinario');
@@ -2695,8 +2697,8 @@ window.atualizarSelectsConfiguracoes = function() {
         });
     }
 
-    // ATENÇÃO: Troque os nomes entre aspas simples pelos IDs EXATOS dos <select> no seu HTML
-    atualizar(['id-do-select-de-cargo'], clinicaLogada.cargos);
-    atualizar(['id-do-select-de-animal-recepcao', 'id-do-select-de-animal-cliente'], clinicaLogada.tipos_animais);
-    atualizar(['id-do-select-de-categoria-prontuario'], clinicaLogada.categorias_prontuario);
+    // Liga as configurações globais com os selects de todo o sistema
+    atualizar(['modal-select-cargo'], clinicaLogada.cargos);
+    atualizar(['modal-select-animal'], clinicaLogada.tipos_animais);
+    atualizar(['modal-select-tipo-agenda', 'modal-select-categoria-prontuario'], clinicaLogada.categorias_prontuario);
 };
