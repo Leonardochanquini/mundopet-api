@@ -50,9 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-function iniciarRotacaoImagens() {
+ffunction iniciarRotacaoImagens() {
     const imgElement = document.getElementById('img-sistema-exibicao');
-    if (!imgElement) return;
+    
+    // Verificação de erro: se não achar a imagem, avisa no console
+    if (!imgElement) {
+        console.error("ERRO: Elemento 'img-sistema-exibicao' não encontrado no HTML!");
+        return;
+    }
 
     const imagens = [
         'assets/visao_de_negocio.png',
@@ -61,18 +66,22 @@ function iniciarRotacaoImagens() {
     ];
 
     let indice = 0;
+    console.log("Iniciando rotação de imagens...");
 
     setInterval(() => {
-        // 1. Aplica o efeito de desaparecer
+        // Adiciona classe para sumir
         imgElement.classList.add('fade-out');
 
-        // 2. Aguarda a transição CSS (500ms) para trocar a imagem
         setTimeout(() => {
             indice = (indice + 1) % imagens.length;
             imgElement.src = imagens[indice];
+            console.log("Imagem atualizada para:", imagens[indice]);
             
-            // 3. Remove a classe para reaparecer com a nova imagem
+            // Remove a classe para aparecer
             imgElement.classList.remove('fade-out');
-        }, 500); 
+        }, 500); // Deve ser igual ao tempo do CSS (0.5s)
     }, 3000);
 }
+
+// Garante que o script rode após carregar tudo
+document.addEventListener('DOMContentLoaded', iniciarRotacaoImagens);
