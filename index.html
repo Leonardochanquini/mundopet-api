@@ -172,6 +172,16 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
     .modal-content { width: 95% !important; padding: 20px !important; margin: 10px; max-height: 85vh; }
     .modal-content .grid-cols-2, .modal-content .grid-cols-3, #etapa-3 .grid-cols-2 { grid-template-columns: 1fr !important; gap: 10px !important; }
 }
+
+    /* Adicione isso na sua tag <style> */
+    #img-sistema-exibicao {
+        transition: opacity 0.5s ease-in-out;
+        opacity: 1;
+    }
+
+    #img-sistema-exibicao.fade-out {
+        opacity: 0;
+    }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>

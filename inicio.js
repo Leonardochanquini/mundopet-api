@@ -50,10 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Função para rotacionar as imagens do "Conheça por Dentro"
 function iniciarRotacaoImagens() {
     const imgElement = document.getElementById('img-sistema-exibicao');
-    if (!imgElement) return; // Se não achar o elemento, para a execução
+    if (!imgElement) return;
 
     const imagens = [
         'assets/visao_de_negocio.png',
@@ -64,10 +63,16 @@ function iniciarRotacaoImagens() {
     let indice = 0;
 
     setInterval(() => {
-        indice = (indice + 1) % imagens.length;
-        imgElement.src = imagens[indice];
-    }, 3000); // 3000ms = 3 segundos de intervalo
-}
+        // 1. Aplica o efeito de desaparecer
+        imgElement.classList.add('fade-out');
 
-// Chame a função quando o DOM carregar
-document.addEventListener('DOMContentLoaded', iniciarRotacaoImagens);
+        // 2. Aguarda a transição CSS (500ms) para trocar a imagem
+        setTimeout(() => {
+            indice = (indice + 1) % imagens.length;
+            imgElement.src = imagens[indice];
+            
+            // 3. Remove a classe para reaparecer com a nova imagem
+            imgElement.classList.remove('fade-out');
+        }, 500); 
+    }, 3000);
+}
