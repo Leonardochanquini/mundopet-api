@@ -26,9 +26,9 @@ db.serialize(() => {
         categorias_prontuario TEXT,
         tipos_animais TEXT,
         cargos TEXT
-    )`, (err) => {
-        if (err) console.error("Erro ao criar tabela clinicas:", err.message);
-    });
+    )`)
+});
+
     db.run(`CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         clinic_id INTEGER,
@@ -95,15 +95,15 @@ db.serialize(() => {
             db.run(`ALTER TABLE agenda ADD COLUMN status TEXT DEFAULT 'Agendado'`, (err) => {});
         });
         db.run(`CREATE TABLE IF NOT EXISTS clientes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            clinic_id INTEGER,
-            nome TEXT,
-            cpf TEXT,
-            telefone TEXT,
-            endereco TEXT,
-            pets TEXT,
-            FOREIGN KEY (clinic_id) REFERENCES clinicas(id)
-)`);
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        clinic_id INTEGER,
+        nome TEXT NOT NULL,
+        cpf TEXT,
+        telefone TEXT,
+        endereco TEXT,
+        pets TEXT,
+        FOREIGN KEY (clinic_id) REFERENCES clinicas(id)
+    )`);
     db.run(`CREATE TABLE IF NOT EXISTS prontuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         clinic_id INTEGER,
@@ -118,8 +118,7 @@ db.serialize(() => {
         prescricao TEXT,
         FOREIGN KEY (clinic_id) REFERENCES clinicas(id)
     )`);
-    // Rota para salvar cliente
-});
+
 // --- FUNÇÃO INTERNA DE AUDITORIA ---
 function registrarAuditoria(clinic_id, usuario, acao) {
     if (!clinic_id) return;
@@ -366,17 +365,9 @@ app.get('/api/agenda/:clinica_id', (req, res) => {
     });
 });
 
-app.post('/api/agendamentos', (req, res) => {
-    const { data, hora, veterinario_id } = req.body;
-
-    // Bloqueia se já existir (Linha exata para inserir antes do INSERT)
-    db.get("SELECT id FROM agenda WHERE data = ? AND hora = ? AND veterinario_id = ?", 
-        [data, hora, veterinario_id], (err, row) => {
-        
-        if (row) {
-            return res.status(400).json({ error: "Horário indisponível para este veterinário." });
-        }
-
+app.post('/api/agenda', (req, res) => {
+    const { clinic_id, cliente, pet, data, hora, tipo, especialidade, veterinario, obs } = req.body;
+    
     db.run(`INSERT INTO agenda (clinic_id, cliente, pet, data, hora, tipo, especialidade, veterinario, obs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
     [clinic_id, cliente, pet, data, hora, tipo, especialidade, veterinario, obs], function(err) {
         if (err) return res.status(500).json({ error: "Erro ao salvar agendamento." });
@@ -394,21 +385,19 @@ app.get('/api/clientes/:clinica_id', (req, res) => {
         res.json(rows);
     });
 });
+
 app.post('/api/clientes', (req, res) => {
     const { clinic_id, nome, cpf, telefone, endereco, pets } = req.body;
-    // CONVERTE O ARRAY PARA STRING JSON
-    const petsString = JSON.stringify(pets || []); 
-
-    db.run(`INSERT INTO clientes (clinic_id, nome, cpf, telefone, endereco, pets) VALUES (?, ?, ?, ?, ?, ?)`,
-        [clinic_id, nome, cpf, telefone, endereco, petsString],
-        function(err) {
-            if (err) {
-                console.error("Erro SQL:", err);
-                return res.status(500).json({ error: err.message });
-            }
-            res.json({ success: true, id: this.lastID });
+    db.run(`INSERT INTO clientes (clinic_id, nome, cpf, telefone, endereco, pets) VALUES (?, ?, ?, ?, ?, ?)`, 
+    [clinic_id, nome, cpf, telefone, endereco, JSON.stringify(pets || [])], function(err) {
+        if (err) {
+            console.error("Erro no Banco:", err);
+            return res.status(500).json({ error: "Erro ao salvar cliente." });
         }
-    );
+        
+        registrarAuditoria(clinic_id, req.headers['x-usuario-nome'] || 'Desconhecido', `Cadastrou o cliente: ${nome}`);
+        res.json({ success: true, id: this.lastID });
+    });
 });
 
 app.put('/api/clientes/:id', (req, res) => {
@@ -454,6 +443,10 @@ app.post('/api/prontuarios', (req, res) => {
     });
 });
 
+app.listen(port, () => {
+    console.log(`🚀 Servidor Mundo Pet rodando em http://localhost:${port}`);
+});
+
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Se for outro provedor, altere aqui
@@ -494,16 +487,4 @@ async function enviarEmailContaCriada(destinatario, nome, role, cpf) {
     } catch (error) {
         console.error("Erro ao enviar e-mail:", error);
     }
-}});
-
-// Substitua o seu app.listen atual por este:
-app.listen(port, '0.0.0.0', () => {
-    console.log(`🚀 Servidor rodando na porta ${port}`);
-}).on('error', (err) => {
-    console.error('❌ Erro ao iniciar o servidor:', err);
-});
-
-// Adicione isso no final do arquivo para capturar o erro que está matando o processo
-process.on('uncaughtException', (err) => {
-    console.error('CRASH INESPERADO:', err);
-});
+}
