@@ -678,24 +678,9 @@
                     document.getElementById('modal-container').style.display = 'flex';
                 };
 
-                // HTML do calendário interativo mantendo o padrão visual
-                cont.innerHTML = `
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center gap-4">
-                            <button onclick="window.mudarMes(-1)" class="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100 rounded font-bold text-gray-600">&lt;</button>
-                            <h3 id="mes-ano-display" class="font-bold text-lg min-w-[150px] text-center text-gray-800"></h3>
-                            <button onclick="window.mudarMes(1)" class="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100 rounded font-bold text-gray-600">&gt;</button>
-                        </div>
-                        ${clinicaLogada.role === 'Veterinário' ? '' : '<button onclick="abrirModalAgendamento()" class="btn-principal px-4 py-2 rounded-lg font-bold shadow-sm">+ Novo Agendamento</button>'}
-                    </div>
-                    <div class="card">
-                        <div class="grid grid-cols-7 gap-2 text-center font-bold text-gray-400 text-xs uppercase mb-2">
-                            <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
-                        </div>
-                        <div id="calendario-container" class="grid grid-cols-7 gap-2 text-center">
-                            </div>
-                    </div>
-                `;
+             <button onclick="abrirModalAgendamento()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-all">
+    <i class="fa-solid fa-plus"></i> + Novo Agendamento
+</button>
 
                 // Renderiza assim que injetar o HTML
                 setTimeout(window.renderizarCalendario, 0);
@@ -2582,4 +2567,83 @@ async function salvarNovaEspecialidade(nomeEspecialidade) {
         body: JSON.stringify({ clinic_id: clinicaId, nome: nomeEspecialidade })
     });
     await sincronizarDados(); // Isso recarrega a lista do banco e já atualiza os selects de toda a tela.
+};
+window.abrirModalAgendamento = function() {
+    const modalTitulo = document.getElementById('modal-titulo');
+    const modalBody = document.getElementById('modal-body');
+    const modalContainer = document.getElementById('modal-container');
+
+    if (!modalTitulo || !modalBody || !modalContainer) {
+        console.error("Erro: Elementos do modal container não foram encontrados no HTML.");
+        return;
+    }
+
+    modalTitulo.textContent = 'Novo Agendamento';
+    
+    modalBody.innerHTML = `
+        <form id="form-novo-agendamento" class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold text-gray-600 mb-1">Paciente / Animal</label>
+                <input type="text" id="agenda-paciente" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-600 mb-1">Tutor / Cliente</label>
+                <input type="text" id="agenda-tutor" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Data</label>
+                    <input type="date" id="agenda-data" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Horário</label>
+                    <input type="time" id="agenda-hora" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-gray-600 mb-1">Veterinário / Especialidade</label>
+                <select id="select-especialidade-recepcao" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all mt-4">Salvar Agendamento</button>
+        </form>
+    `;
+
+    modalContainer.classList.remove('hidden');
+    // Garantia extra: caso seu modal use display flex ao invés de classe hidden do tailwind
+    modalContainer.style.display = 'flex'; 
+
+    if (typeof window.atualizarSelectsEspecialidades === 'function') {
+        window.atualizarSelectsEspecialidades();
+    }
+
+    document.getElementById('form-novo-agendamento').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const dados = {
+            clinic_id: clinicaId,
+            paciente: document.getElementById('agenda-paciente').value,
+            tutor: document.getElementById('agenda-tutor').value,
+            data: document.getElementById('agenda-data').value,
+            hora: document.getElementById('agenda-hora').value,
+            veterinario: document.getElementById('select-especialidade-recepcao').value
+        };
+
+        try {
+            // AQUI ESTAVA O ERRO: Substituído por template string limpa do JS
+            const res = await fetch(`${API_BASE_URL}/api/agenda`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dados)
+            });
+
+            if (res.ok) {
+                if (typeof fecharModal === 'function') fecharModal();
+                if (typeof sincronizarDados === 'function') await sincronizarDados();
+            } else {
+                alert('Erro ao salvar o agendamento.');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
 };
