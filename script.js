@@ -98,15 +98,15 @@ db.serialize(() => {
             db.run(`ALTER TABLE agenda ADD COLUMN status TEXT DEFAULT 'Agendado'`, (err) => {});
         });
         db.run(`CREATE TABLE IF NOT EXISTS clientes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        clinic_id INTEGER,
-        nome TEXT NOT NULL,
-        cpf TEXT,
-        telefone TEXT,
-        endereco TEXT,
-        pets TEXT,
-        FOREIGN KEY (clinic_id) REFERENCES clinicas(id)
-    )`);
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            clinic_id INTEGER,
+            nome TEXT,
+            cpf TEXT,
+            telefone TEXT,
+            endereco TEXT,
+            pets TEXT,
+            FOREIGN KEY (clinic_id) REFERENCES clinicas(id)
+)`);
     db.run(`CREATE TABLE IF NOT EXISTS prontuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         clinic_id INTEGER,
@@ -121,6 +121,7 @@ db.serialize(() => {
         prescricao TEXT,
         FOREIGN KEY (clinic_id) REFERENCES clinicas(id)
     )`);
+    // Rota para salvar cliente
 
 // --- FUNÇÃO INTERNA DE AUDITORIA ---
 function registrarAuditoria(clinic_id, usuario, acao) {
@@ -396,19 +397,21 @@ app.get('/api/clientes/:clinica_id', (req, res) => {
         res.json(rows);
     });
 });
-
 app.post('/api/clientes', (req, res) => {
     const { clinic_id, nome, cpf, telefone, endereco, pets } = req.body;
-    db.run(`INSERT INTO clientes (clinic_id, nome, cpf, telefone, endereco, pets) VALUES (?, ?, ?, ?, ?, ?)`, 
-    [clinic_id, nome, cpf, telefone, endereco, JSON.stringify(pets || [])], function(err) {
-        if (err) {
-            console.error("Erro no Banco:", err);
-            return res.status(500).json({ error: "Erro ao salvar cliente." });
+    // CONVERTE O ARRAY PARA STRING JSON
+    const petsString = JSON.stringify(pets || []); 
+
+    db.run(`INSERT INTO clientes (clinic_id, nome, cpf, telefone, endereco, pets) VALUES (?, ?, ?, ?, ?, ?)`,
+        [clinic_id, nome, cpf, telefone, endereco, petsString],
+        function(err) {
+            if (err) {
+                console.error("Erro SQL:", err);
+                return res.status(500).json({ error: err.message });
+            }
+            res.json({ success: true, id: this.lastID });
         }
-        
-        registrarAuditoria(clinic_id, req.headers['x-usuario-nome'] || 'Desconhecido', `Cadastrou o cliente: ${nome}`);
-        res.json({ success: true, id: this.lastID });
-    });
+    );
 });
 
 app.put('/api/clientes/:id', (req, res) => {
