@@ -1803,141 +1803,107 @@
             location.reload();
         }
 
-        function abrirModalAgendamento() {
-    document.getElementById('modal-titulo').innerText = "Novo Agendamento";
-    document.getElementById('modal-body').innerHTML = `
-        <div class="space-y-4">
+        window.abrirModalAgendamento = function() {
+    const modalBody = document.getElementById('modal-body');
+    const modalTitulo = document.getElementById('modal-titulo');
+    
+    modalTitulo.textContent = "Novo Agendamento";
+    
+    // Renderiza o formulário interno do modal garantindo que os IDs batam com o banco
+    modalBody.innerHTML = `
+        <form id="form-novo-agendamento" class="space-y-4" onsubmit="salvarAgendamento(event)">
             <div>
-                <label class="text-xs font-bold text-gray-500 mb-1 block">Nome do Cliente *</label>
-                <select id="agenda-cliente" class="input-pet">
-                    <option value="">Coloque o nome do cliente</option>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Cliente *</label>
+                <select id="agenda-cliente" class="w-full p-3 border rounded-xl" required>
+                    <option value="">Selecione um Cliente...</option>
                 </select>
             </div>
             <div>
-                <label class="text-xs font-bold text-gray-500 mb-1 block">Nome do Pet *</label>
-                <input id="agenda-pet" placeholder="Selecione o cliente primeiro" class="input-pet bg-gray-100 cursor-not-allowed" required disabled>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Veterinário/Colaborador *</label>
+                <select id="agenda-colaborador" class="w-full p-3 border rounded-xl" required>
+                    <option value="">Selecione um Veterinário...</option>
+                </select>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="text-xs font-bold text-gray-500 mb-1 block">Data *</label>
-                    <input id="agenda-data" type="date" class="input-pet" required onchange="window.atualizarHorarios(this.value)">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Data *</label>
+                    <input type="date" id="agenda-data" class="w-full p-3 border rounded-xl" required onchange="atualizarHorariosDisponiveis()">
                 </div>
                 <div>
-                    <label class="text-xs font-bold text-gray-500 mb-1 block">Hora *</label>
-                    <select id="agenda-hora" class="input-pet" required disabled>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Horário *</label>
+                    <select id="agenda-horario" class="w-full p-3 border rounded-xl" required>
                         <option value="">Selecione a data primeiro...</option>
                     </select>
                 </div>
             </div>
             <div>
-                <label class="text-xs font-bold text-gray-500 mb-1 block">Tipo de Atendimento</label>
-                <select id="agenda-tipo" class="input-pet" onchange="
-                    const mostrar = (this.value === 'Consulta' || this.value === 'Retorno');
-                    document.getElementById('container-especialidade').style.display = mostrar ? 'block' : 'none';
-                    if (!mostrar) {
-                        document.getElementById('div-veterinario').style.display = 'none';
-                        document.getElementById('agenda-veterinario').value = '';
-                    } else {
-                        window.atualizarVeterinarios();
-                    }
-                ">
-                    <option value="Consulta">Consulta</option>
-                    <option value="Retorno">Retorno</option>
-                    <option value="Exame">Exame</option>
-                    <option value="Vacina">Vacina</option>
-                    <option value="Banho/Tosa">Banho/Tosa</option>
-                </select>
+                <label class="block text-sm font-bold text-gray-700 mb-1">Motivo/Procedimento *</label>
+                <input type="text" id="agenda-motivo" class="w-full p-3 border rounded-xl" placeholder="Ex: Consulta de rotina, Vacina" required>
             </div>
-            <div id="container-especialidade" style="display: block;">
-                <label class="text-xs font-bold text-gray-500 mb-1 block">Especialidade</label>
-                <select id="agenda-especialidade" class="w-full p-2 border rounded mt-1" onchange="atualizarVeterinarios()">
-                    <option value="Clínica Geral">Clínica Geral</option>
-                    <option value="Cardiologia">Cardiologia</option>
-                </select>
+            <div class="flex justify-end gap-3 mt-6">
+                <button type="submit" class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl">Agendar</button>
             </div>
-            <div id="div-veterinario" style="display: none;" class="mt-4">
-                <label class="block text-sm font-semibold text-gray-700">Veterinário</label>
-                <select id="agenda-veterinario" class="w-full p-2 border rounded mt-1"></select>
-            </div>
-            <div>
-                <label class="text-xs font-bold text-gray-500 mb-1 block">Observações</label>
-                <textarea id="agenda-obs" placeholder="Motivo da consulta, sintomas, etc..." class="input-pet" rows="2"></textarea>
-            </div>
-        </div>
+        </form>
     `;
 
-        // Ativa o input de Pet apenas se um cliente for selecionado
-        document.getElementById('agenda-cliente').addEventListener('change', function() {
-            const petInput = document.getElementById('agenda-pet');
-            if (this.value !== "") {
-                petInput.disabled = false;
-                petInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
-                petInput.placeholder = "Ex: Rex";
-            } else {
-                petInput.disabled = true;
-                petInput.classList.add('bg-gray-100', 'cursor-not-allowed');
-                petInput.placeholder = "Selecione o cliente primeiro";
-                petInput.value = ""; 
+    // Popula o select de clientes dinamicamente com os dados já sincronizados
+    const selectCliente = document.getElementById('agenda-cliente');
+    if (selectCliente && typeof clientes !== 'undefined') {
+        selectCliente.innerHTML = '<option value="">Selecione um Cliente...</option>';
+        clientes.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.nome;
+            selectCliente.appendChild(opt);
+        });
+    } else if (selectCliente) {
+        // Fallback caso a variável global tenha outro nome (ex: dadosClinica.clientes)
+        fetch(`/api/clientes/${clinicaId}`)
+            .then(res => res.json())
+            .then(data => {
+                selectCliente.innerHTML = '<option value="">Selecione um Cliente...</option>';
+                data.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.nome;
+                    selectCliente.appendChild(opt);
+                });
+            }).catch(() => {});
+    }
+
+    // Popula o select de veterinários/equipe
+    const selectColab = document.getElementById('agenda-colaborador');
+    if (selectColab && typeof equipe !== 'undefined') {
+        selectColab.innerHTML = '<option value="">Selecione um Veterinário...</option>';
+        equipe.forEach(e => {
+            if(e.role === 'veterinario' || e.role === 'admin' || e.especialidade) {
+                const opt = document.createElement('option');
+                opt.value = e.id;
+                opt.textContent = e.nome;
+                selectColab.appendChild(opt);
             }
         });
+    }
 
-        fetch(`/api/clientes/${clinicaId}`) // Ajuste a rota se a sua URL de clientes for diferente
-            .then(res => res.json())
-            .then(clientes => {
-                const selectCliente = document.getElementById('agenda-cliente');
-                if (clientes && clientes.length > 0) {
-                    selectCliente.innerHTML = '<option value="">Selecione o Cliente</option>' + 
-                        clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
-                } else {
-                    selectCliente.innerHTML = '<option value="">Nenhum cliente cadastrado</option>';
-                }
-            })
-            .catch(err => {
-                console.error("Erro ao carregar clientes:", err);
-                document.getElementById('agenda-cliente').innerHTML = '<option value="">Erro ao carregar</option>';
-            });
+    // Força a exibição do modal do seu framework visual
+    document.getElementById('modal-container').classList.remove('hidden');
+};
 
-    document.getElementById('modal-confirmar').onclick = async () => {
-        const cliente = document.getElementById('agenda-cliente').value;
-        const pet = document.getElementById('agenda-pet').value;
-        const data = document.getElementById('agenda-data').value;
-        const hora = document.getElementById('agenda-hora').value;
-        const tipo = document.getElementById('agenda-tipo').value;
-        const obs = document.getElementById('agenda-obs').value;
-        const especialidade = document.getElementById('agenda-especialidade').value; // <-- LINHA ADICIONADA
-        const vetSelect = document.getElementById('agenda-veterinario');
-        const veterinario = vetSelect && vetSelect.value ? vetSelect.value : null;
+window.atualizarHorariosDisponiveis = function() {
+    const selectHorario = document.getElementById('agenda-horario');
+    if (!selectHorario) return;
 
-        if (!cliente || !pet || !data || !hora) {
-            return mostrarPopup('⚠️ Atenção', 'Preencha Cliente, Pet, Data e Hora.');
-        }
-
-        const novoAgendamento = { clinic_id: clinicaId, cliente, pet, data, hora, tipo, especialidade: tipo === 'Consulta' ? especialidade : null, veterinario: tipo === 'Consulta' ? veterinario : null, obs };
-
-        try {
-            await fetch('/api/agenda', {
-                method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(novoAgendamento)
-            });
-        } catch(e) {
-            console.log("Aviso: Servidor de agenda não encontrado na 8080. Salvando localmente para visualização.");
-        }
-        
-        // Adiciona à lista local imediatamente
-        agendamentos.push(novoAgendamento);
-
-        mostrarPopup('✅ Sucesso', 'Agendamento salvo com sucesso!');
-        fecharModal();
-        
-        // Atualiza a tela do calendário para exibir o novo item na hora
-        if (typeof window.renderizarCalendario === 'function') {
-            window.renderizarCalendario();
-        }
-    };
-
-    document.getElementById('modal-container').style.display = 'flex';
-}
+    // Lista padrão de horários da clínica
+    const horarios = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
+    
+    selectHorario.innerHTML = '<option value="">Selecione um horário...</option>';
+    horarios.forEach(h => {
+        const opt = document.createElement('option');
+        opt.value = h;
+        opt.textContent = h;
+        selectHorario.appendChild(opt);
+    });
+};
 
 // === FUNÇÕES DE CLIENTES ===
         async function carregarPets() {
