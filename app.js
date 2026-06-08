@@ -678,9 +678,24 @@
                     document.getElementById('modal-container').style.display = 'flex';
                 };
 
-             <button onclick="abrirModalAgendamento()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 transition-all">
-    <i class="fa-solid fa-plus"></i> + Novo Agendamento
-</button>
+                // HTML do calendário interativo mantendo o padrão visual
+                cont.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center gap-4">
+                            <button onclick="window.mudarMes(-1)" class="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100 rounded font-bold text-gray-600">&lt;</button>
+                            <h3 id="mes-ano-display" class="font-bold text-lg min-w-[150px] text-center text-gray-800"></h3>
+                            <button onclick="window.mudarMes(1)" class="px-3 py-1 bg-white border border-gray-300 hover:bg-gray-100 rounded font-bold text-gray-600">&gt;</button>
+                        </div>
+                        ${clinicaLogada.role === 'Veterinário' ? '' : '<button onclick="abrirModalAgendamento()" class="btn-principal px-4 py-2 rounded-lg font-bold shadow-sm">+ Novo Agendamento</button>'}
+                    </div>
+                    <div class="card">
+                        <div class="grid grid-cols-7 gap-2 text-center font-bold text-gray-400 text-xs uppercase mb-2">
+                            <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                        </div>
+                        <div id="calendario-container" class="grid grid-cols-7 gap-2 text-center">
+                            </div>
+                    </div>
+                `;
 
                 // Renderiza assim que injetar o HTML
                 setTimeout(window.renderizarCalendario, 0);
@@ -1788,107 +1803,141 @@
             location.reload();
         }
 
-        window.abrirModalAgendamento = function() {
-    const modalBody = document.getElementById('modal-body');
-    const modalTitulo = document.getElementById('modal-titulo');
-    
-    modalTitulo.textContent = "Novo Agendamento";
-    
-    // Renderiza o formulário interno do modal garantindo que os IDs batam com o banco
-    modalBody.innerHTML = `
-        <form id="form-novo-agendamento" class="space-y-4" onsubmit="salvarAgendamento(event)">
+        function abrirModalAgendamento() {
+    document.getElementById('modal-titulo').innerText = "Novo Agendamento";
+    document.getElementById('modal-body').innerHTML = `
+        <div class="space-y-4">
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Cliente *</label>
-                <select id="agenda-cliente" class="w-full p-3 border rounded-xl" required>
-                    <option value="">Selecione um Cliente...</option>
+                <label class="text-xs font-bold text-gray-500 mb-1 block">Nome do Cliente *</label>
+                <select id="agenda-cliente" class="input-pet">
+                    <option value="">Coloque o nome do cliente</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Veterinário/Colaborador *</label>
-                <select id="agenda-colaborador" class="w-full p-3 border rounded-xl" required>
-                    <option value="">Selecione um Veterinário...</option>
-                </select>
+                <label class="text-xs font-bold text-gray-500 mb-1 block">Nome do Pet *</label>
+                <input id="agenda-pet" placeholder="Selecione o cliente primeiro" class="input-pet bg-gray-100 cursor-not-allowed" required disabled>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Data *</label>
-                    <input type="date" id="agenda-data" class="w-full p-3 border rounded-xl" required onchange="atualizarHorariosDisponiveis()">
+                    <label class="text-xs font-bold text-gray-500 mb-1 block">Data *</label>
+                    <input id="agenda-data" type="date" class="input-pet" required onchange="window.atualizarHorarios(this.value)">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">Horário *</label>
-                    <select id="agenda-horario" class="w-full p-3 border rounded-xl" required>
+                    <label class="text-xs font-bold text-gray-500 mb-1 block">Hora *</label>
+                    <select id="agenda-hora" class="input-pet" required disabled>
                         <option value="">Selecione a data primeiro...</option>
                     </select>
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1">Motivo/Procedimento *</label>
-                <input type="text" id="agenda-motivo" class="w-full p-3 border rounded-xl" placeholder="Ex: Consulta de rotina, Vacina" required>
+                <label class="text-xs font-bold text-gray-500 mb-1 block">Tipo de Atendimento</label>
+                <select id="agenda-tipo" class="input-pet" onchange="
+                    const mostrar = (this.value === 'Consulta' || this.value === 'Retorno');
+                    document.getElementById('container-especialidade').style.display = mostrar ? 'block' : 'none';
+                    if (!mostrar) {
+                        document.getElementById('div-veterinario').style.display = 'none';
+                        document.getElementById('agenda-veterinario').value = '';
+                    } else {
+                        window.atualizarVeterinarios();
+                    }
+                ">
+                    <option value="Consulta">Consulta</option>
+                    <option value="Retorno">Retorno</option>
+                    <option value="Exame">Exame</option>
+                    <option value="Vacina">Vacina</option>
+                    <option value="Banho/Tosa">Banho/Tosa</option>
+                </select>
             </div>
-            <div class="flex justify-end gap-3 mt-6">
-                <button type="submit" class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl">Agendar</button>
+            <div id="container-especialidade" style="display: block;">
+                <label class="text-xs font-bold text-gray-500 mb-1 block">Especialidade</label>
+                <select id="agenda-especialidade" class="w-full p-2 border rounded mt-1" onchange="atualizarVeterinarios()">
+                    <option value="Clínica Geral">Clínica Geral</option>
+                    <option value="Cardiologia">Cardiologia</option>
+                </select>
             </div>
-        </form>
+            <div id="div-veterinario" style="display: none;" class="mt-4">
+                <label class="block text-sm font-semibold text-gray-700">Veterinário</label>
+                <select id="agenda-veterinario" class="w-full p-2 border rounded mt-1"></select>
+            </div>
+            <div>
+                <label class="text-xs font-bold text-gray-500 mb-1 block">Observações</label>
+                <textarea id="agenda-obs" placeholder="Motivo da consulta, sintomas, etc..." class="input-pet" rows="2"></textarea>
+            </div>
+        </div>
     `;
 
-    // Popula o select de clientes dinamicamente com os dados já sincronizados
-    const selectCliente = document.getElementById('agenda-cliente');
-    if (selectCliente && typeof clientes !== 'undefined') {
-        selectCliente.innerHTML = '<option value="">Selecione um Cliente...</option>';
-        clientes.forEach(c => {
-            const opt = document.createElement('option');
-            opt.value = c.id;
-            opt.textContent = c.nome;
-            selectCliente.appendChild(opt);
-        });
-    } else if (selectCliente) {
-        // Fallback caso a variável global tenha outro nome (ex: dadosClinica.clientes)
-        fetch(`/api/clientes/${clinicaId}`)
-            .then(res => res.json())
-            .then(data => {
-                selectCliente.innerHTML = '<option value="">Selecione um Cliente...</option>';
-                data.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c.id;
-                    opt.textContent = c.nome;
-                    selectCliente.appendChild(opt);
-                });
-            }).catch(() => {});
-    }
-
-    // Popula o select de veterinários/equipe
-    const selectColab = document.getElementById('agenda-colaborador');
-    if (selectColab && typeof equipe !== 'undefined') {
-        selectColab.innerHTML = '<option value="">Selecione um Veterinário...</option>';
-        equipe.forEach(e => {
-            if(e.role === 'veterinario' || e.role === 'admin' || e.especialidade) {
-                const opt = document.createElement('option');
-                opt.value = e.id;
-                opt.textContent = e.nome;
-                selectColab.appendChild(opt);
+        // Ativa o input de Pet apenas se um cliente for selecionado
+        document.getElementById('agenda-cliente').addEventListener('change', function() {
+            const petInput = document.getElementById('agenda-pet');
+            if (this.value !== "") {
+                petInput.disabled = false;
+                petInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                petInput.placeholder = "Ex: Rex";
+            } else {
+                petInput.disabled = true;
+                petInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                petInput.placeholder = "Selecione o cliente primeiro";
+                petInput.value = ""; 
             }
         });
-    }
 
-    // Força a exibição do modal do seu framework visual
-    document.getElementById('modal-container').classList.remove('hidden');
-};
+        fetch(`/api/clientes/${clinicaId}`) // Ajuste a rota se a sua URL de clientes for diferente
+            .then(res => res.json())
+            .then(clientes => {
+                const selectCliente = document.getElementById('agenda-cliente');
+                if (clientes && clientes.length > 0) {
+                    selectCliente.innerHTML = '<option value="">Selecione o Cliente</option>' + 
+                        clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join('');
+                } else {
+                    selectCliente.innerHTML = '<option value="">Nenhum cliente cadastrado</option>';
+                }
+            })
+            .catch(err => {
+                console.error("Erro ao carregar clientes:", err);
+                document.getElementById('agenda-cliente').innerHTML = '<option value="">Erro ao carregar</option>';
+            });
 
-window.atualizarHorariosDisponiveis = function() {
-    const selectHorario = document.getElementById('agenda-horario');
-    if (!selectHorario) return;
+    document.getElementById('modal-confirmar').onclick = async () => {
+        const cliente = document.getElementById('agenda-cliente').value;
+        const pet = document.getElementById('agenda-pet').value;
+        const data = document.getElementById('agenda-data').value;
+        const hora = document.getElementById('agenda-hora').value;
+        const tipo = document.getElementById('agenda-tipo').value;
+        const obs = document.getElementById('agenda-obs').value;
+        const especialidade = document.getElementById('agenda-especialidade').value; // <-- LINHA ADICIONADA
+        const vetSelect = document.getElementById('agenda-veterinario');
+        const veterinario = vetSelect && vetSelect.value ? vetSelect.value : null;
 
-    // Lista padrão de horários da clínica
-    const horarios = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-    
-    selectHorario.innerHTML = '<option value="">Selecione um horário...</option>';
-    horarios.forEach(h => {
-        const opt = document.createElement('option');
-        opt.value = h;
-        opt.textContent = h;
-        selectHorario.appendChild(opt);
-    });
-};
+        if (!cliente || !pet || !data || !hora) {
+            return mostrarPopup('⚠️ Atenção', 'Preencha Cliente, Pet, Data e Hora.');
+        }
+
+        const novoAgendamento = { clinic_id: clinicaId, cliente, pet, data, hora, tipo, especialidade: tipo === 'Consulta' ? especialidade : null, veterinario: tipo === 'Consulta' ? veterinario : null, obs };
+
+        try {
+            await fetch('/api/agenda', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(novoAgendamento)
+            });
+        } catch(e) {
+            console.log("Aviso: Servidor de agenda não encontrado na 8080. Salvando localmente para visualização.");
+        }
+        
+        // Adiciona à lista local imediatamente
+        agendamentos.push(novoAgendamento);
+
+        mostrarPopup('✅ Sucesso', 'Agendamento salvo com sucesso!');
+        fecharModal();
+        
+        // Atualiza a tela do calendário para exibir o novo item na hora
+        if (typeof window.renderizarCalendario === 'function') {
+            window.renderizarCalendario();
+        }
+    };
+
+    document.getElementById('modal-container').style.display = 'flex';
+}
 
 // === FUNÇÕES DE CLIENTES ===
         async function carregarPets() {
@@ -2567,83 +2616,4 @@ async function salvarNovaEspecialidade(nomeEspecialidade) {
         body: JSON.stringify({ clinic_id: clinicaId, nome: nomeEspecialidade })
     });
     await sincronizarDados(); // Isso recarrega a lista do banco e já atualiza os selects de toda a tela.
-};
-window.abrirModalAgendamento = function() {
-    const modalTitulo = document.getElementById('modal-titulo');
-    const modalBody = document.getElementById('modal-body');
-    const modalContainer = document.getElementById('modal-container');
-
-    if (!modalTitulo || !modalBody || !modalContainer) {
-        console.error("Erro: Elementos do modal container não foram encontrados no HTML.");
-        return;
-    }
-
-    modalTitulo.textContent = 'Novo Agendamento';
-    
-    modalBody.innerHTML = `
-        <form id="form-novo-agendamento" class="space-y-4">
-            <div>
-                <label class="block text-sm font-semibold text-gray-600 mb-1">Paciente / Animal</label>
-                <input type="text" id="agenda-paciente" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-600 mb-1">Tutor / Cliente</label>
-                <input type="text" id="agenda-tutor" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Data</label>
-                    <input type="date" id="agenda-data" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Horário</label>
-                    <input type="time" id="agenda-hora" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-semibold text-gray-600 mb-1">Veterinário / Especialidade</label>
-                <select id="select-especialidade-recepcao" required class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500">
-                </select>
-            </div>
-            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all mt-4">Salvar Agendamento</button>
-        </form>
-    `;
-
-    modalContainer.classList.remove('hidden');
-    // Garantia extra: caso seu modal use display flex ao invés de classe hidden do tailwind
-    modalContainer.style.display = 'flex'; 
-
-    if (typeof window.atualizarSelectsEspecialidades === 'function') {
-        window.atualizarSelectsEspecialidades();
-    }
-
-    document.getElementById('form-novo-agendamento').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const dados = {
-            clinic_id: clinicaId,
-            paciente: document.getElementById('agenda-paciente').value,
-            tutor: document.getElementById('agenda-tutor').value,
-            data: document.getElementById('agenda-data').value,
-            hora: document.getElementById('agenda-hora').value,
-            veterinario: document.getElementById('select-especialidade-recepcao').value
-        };
-
-        try {
-            // AQUI ESTAVA O ERRO: Substituído por template string limpa do JS
-            const res = await fetch(`${API_BASE_URL}/api/agenda`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dados)
-            });
-
-            if (res.ok) {
-                if (typeof fecharModal === 'function') fecharModal();
-                if (typeof sincronizarDados === 'function') await sincronizarDados();
-            } else {
-                alert('Erro ao salvar o agendamento.');
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    });
 };

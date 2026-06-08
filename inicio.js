@@ -36,6 +36,18 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+// 4. Lógica do botão "Testar Grátis"
+    const btnTestar = document.getElementById("btn-testar");
+    if (btnTestar) {
+        btnTestar.addEventListener("click", () => {
+            if (typeof irPara === 'function') {
+                irPara('tela-planos');
+            } else {
+                document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden'));
+                document.getElementById('tela-planos').classList.remove('hidden');
+            }
+        });
+    }
     // Lógica do Accordion FAQ
 document.querySelectorAll('.faq-btn').forEach(btn => {
     btn.addEventListener('click', () => {
