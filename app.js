@@ -158,7 +158,50 @@
             document.getElementById('tab-'+r).classList.add('active');
         }
 
-        async function processarAssinatura() { irPara('tela-login'); }
+        let acaoAposPagamento = null;
+
+// Substitui a função processarAssinatura antiga
+async function processarAssinatura() {
+    // Resgata o valor do plano selecionado que já existe na sua lógica
+    const valor = planoSelecionado.preco ? planoSelecionado.preco.toFixed(2).replace('.', ',') : '99,90';
+    
+    // Abre a tela de pagamento passando a ação que vai acontecer após aprovado
+    abrirModalPagamento(valor, () => {
+        mostrarPopup('✅ Pagamento Aprovado!', 'Sua assinatura foi confirmada com sucesso. Bem-vindo ao Mundo Pet!');
+        setTimeout(() => { irPara('tela-login'); }, 2500);
+    });
+}
+
+// Lógica de controle do novo modal
+window.abrirModalPagamento = function(valorMoeda, callbackSucesso) {
+    document.getElementById('valor-pagamento').innerText = 'R$ ' + valorMoeda;
+    document.getElementById('modal-pagamento').classList.remove('hidden');
+    acaoAposPagamento = callbackSucesso;
+};
+
+window.fecharModalPagamento = function() {
+    document.getElementById('modal-pagamento').classList.add('hidden');
+    acaoAposPagamento = null;
+};
+
+window.confirmarPagamentoSimulado = function() {
+    // Pega o botão para criar um efeito de "carregando"
+    const btn = document.querySelector('button[onclick="confirmarPagamentoSimulado()"]');
+    const textoOriginal = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+    btn.disabled = true;
+
+    // Finge um delay de comunicação com o banco (2 segundos) para realismo
+    setTimeout(() => {
+        btn.innerHTML = textoOriginal;
+        btn.disabled = false;
+        fecharModalPagamento();
+        
+        if (acaoAposPagamento) {
+            acaoAposPagamento();
+        }
+    }, 2000);
+};
 
         // Função utilitária para buscar cabeçalhos comuns em rotas seguras
         function getAuthHeaders() {

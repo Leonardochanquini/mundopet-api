@@ -545,5 +545,30 @@ td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--t
     </div>
     <script src="./inicio.js"></script>
     <script src="./app.js"></script>
+    <div id="modal-pagamento" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl w-96 overflow-hidden">
+        <div class="bg-blue-600 p-4 text-center">
+            <h3 class="text-white font-bold text-xl"><i class="fas fa-lock"></i> Pagamento Seguro</h3>
+        </div>
+        <div class="p-6 text-center">
+            <p class="text-gray-600 mb-4">Valor a pagar: <strong id="valor-pagamento" class="text-green-600 text-lg">R$ 0,00</strong></p>
+            
+            <div class="mb-4">
+                <p class="text-sm font-bold text-gray-700 mb-2">Escaneie o QR Code (PIX)</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=MundoPetSimulacaoPagamento" alt="QR Code PIX" class="mx-auto border p-2 rounded-lg mb-2">
+                <code class="bg-gray-100 p-1 rounded text-xs select-all text-gray-500">00020126580014br.gov.bcb.pix...</code>
+            </div>
+
+            <div class="mt-6 flex flex-col gap-2">
+                <button onclick="confirmarPagamentoSimulado()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-all shadow-md">
+                    <i class="fas fa-check-circle"></i> Aprovar Pagamento (Simulação)
+                </button>
+                <button onclick="fecharModalPagamento()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-all">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
