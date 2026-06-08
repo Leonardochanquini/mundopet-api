@@ -1820,7 +1820,7 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-xs font-bold text-gray-500 mb-1 block">Data *</label>
-                    <input id="agenda-data" type="date" class="input-pet" required onchange="window.atualizarHorarios(this.value)">
+                    <input id="agenda-data" type="date" class="input-pet" required oninput="window.atualizarHorarios(this.value)">
                 </div>
                 <div>
                     <label class="text-xs font-bold text-gray-500 mb-1 block">Hora *</label>
@@ -2256,9 +2256,6 @@ window.atualizarHorarios = function(dataSelecionada) {
         return;
     }
 
-    selectHora.disabled = false;
-    selectHora.innerHTML = '<option value="">Selecione o horário...</option>';
-
     // Lista com todos os horários padrão da clínica
     const todosHorarios = [
         "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
@@ -2272,14 +2269,18 @@ window.atualizarHorarios = function(dataSelecionada) {
         .filter(a => a.data === dataSelecionada)
         .map(a => a.hora);
 
-    // Adiciona ao <select> apenas os horários que NÃO estão em horariosOcupados
+    // Constrói tudo em uma única string de texto para não quebrar o DOM do Select
+    let optionsHTML = '<option value="">Selecione o horário...</option>';
+    
     todosHorarios.forEach(hora => {
         if (!horariosOcupados.includes(hora)) {
-            selectHora.innerHTML += `<option value="${hora}">${hora}</option>`;
+            optionsHTML += `<option value="${hora}">${hora}</option>`;
         }
     });
-};
 
+    selectHora.innerHTML = optionsHTML;
+    selectHora.disabled = false;
+};
 window.verDetalhesCliente = function(id) {
     const cliente = window.clientesLista.find(c => c.id === id);
     if(!cliente) return;
