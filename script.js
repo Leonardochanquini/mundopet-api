@@ -26,8 +26,11 @@ db.serialize(() => {
         categorias_prontuario TEXT,
         tipos_animais TEXT,
         cargos TEXT
-    )`)
-});
+    )`), (err) => {
+    if (err) {
+        console.error("Erro ao criar tabela clinicas:", err.message);
+    }
+}});
 
     db.run(`CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -451,10 +454,6 @@ app.post('/api/prontuarios', (req, res) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`🚀 Servidor Mundo Pet rodando em http://localhost:${port}`);
-});
-
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail', // Se for outro provedor, altere aqui
@@ -496,3 +495,15 @@ async function enviarEmailContaCriada(destinatario, nome, role, cpf) {
         console.error("Erro ao enviar e-mail:", error);
     }
 }});
+
+// Substitua o seu app.listen atual por este:
+app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Servidor rodando na porta ${port}`);
+}).on('error', (err) => {
+    console.error('❌ Erro ao iniciar o servidor:', err);
+});
+
+// Adicione isso no final do arquivo para capturar o erro que está matando o processo
+process.on('uncaughtException', (err) => {
+    console.error('CRASH INESPERADO:', err);
+});
