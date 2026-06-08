@@ -26,12 +26,9 @@ db.serialize(() => {
         categorias_prontuario TEXT,
         tipos_animais TEXT,
         cargos TEXT
-    )`), (err) => {
-    if (err) {
-        console.error("Erro ao criar tabela clinicas:", err.message);
-    }
-}});
-
+    )`, (err) => {
+        if (err) console.error("Erro ao criar tabela clinicas:", err.message);
+    });
     db.run(`CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         clinic_id INTEGER,
@@ -122,7 +119,7 @@ db.serialize(() => {
         FOREIGN KEY (clinic_id) REFERENCES clinicas(id)
     )`);
     // Rota para salvar cliente
-
+});
 // --- FUNÇÃO INTERNA DE AUDITORIA ---
 function registrarAuditoria(clinic_id, usuario, acao) {
     if (!clinic_id) return;
