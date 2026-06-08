@@ -2660,3 +2660,54 @@ async function salvarNovaEspecialidade(nomeEspecialidade) {
     });
     await sincronizarDados(); // Isso recarrega a lista do banco e já atualiza os selects de toda a tela.
 };
+// 1. Função que injeta o formulário no modal
+window.abrirModalAgendamento = function() {
+    const modal = document.getElementById('modal-container');
+    const body = document.getElementById('modal-body');
+    document.getElementById('modal-titulo').innerText = "Novo Agendamento";
+    
+    body.innerHTML = `
+        <div class="space-y-4">
+            <div><label class="block text-sm font-bold">Data:</label>
+                 <input type="date" id="input-data-agendamento" onchange="atualizarHorariosDisponiveis()" class="input-pet"></div>
+            <div><label class="block text-sm font-bold">Veterinário:</label>
+                 <select id="select-vet" onchange="atualizarHorariosDisponiveis()" class="input-pet"></select></div>
+            <div><label class="block text-sm font-bold">Horário:</label>
+                 <select id="select-horario" class="input-pet"></select></div>
+        </div>
+    `;
+    
+    // Popular vets
+    const selectVet = document.getElementById('select-vet');
+    selectVet.innerHTML = '<option value="">Selecione...</option>';
+    equipe.filter(m => m.role === 'Veterinário').forEach(v => {
+        selectVet.innerHTML += `<option value="${v.id}">${v.nome}</option>`;
+    });
+
+    modal.style.display = 'flex';
+};
+
+// 2. Lógica de horários (30 em 30 min)
+window.atualizarHorariosDisponiveis = function() {
+    const data = document.getElementById('input-data-agendamento').value;
+    const vetId = document.getElementById('select-vet').value;
+    const selectHorario = document.getElementById('select-horario');
+    
+    if (!data || !vetId) return;
+
+    selectHorario.innerHTML = '<option value="">Selecione...</option>';
+    
+    for (let h = 8; h < 18; h++) {
+        ['00', '30'].forEach(m => {
+            const horaStr = `${h.toString().padStart(2, '0')}:${m}`;
+            const ocupado = agendamentos.some(a => 
+                a.data === data && 
+                a.veterinario_id == vetId && 
+                a.hora === horaStr
+            );
+            if (!ocupado) {
+                selectHorario.innerHTML += `<option value="${horaStr}">${horaStr}</option>`;
+            }
+        });
+    }
+};

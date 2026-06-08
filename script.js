@@ -365,9 +365,17 @@ app.get('/api/agenda/:clinica_id', (req, res) => {
     });
 });
 
-app.post('/api/agenda', (req, res) => {
-    const { clinic_id, cliente, pet, data, hora, tipo, especialidade, veterinario, obs } = req.body;
-    
+app.post('/api/agendamentos', (req, res) => {
+    const { data, hora, veterinario_id } = req.body;
+
+    // Bloqueia se já existir (Linha exata para inserir antes do INSERT)
+    db.get("SELECT id FROM agenda WHERE data = ? AND hora = ? AND veterinario_id = ?", 
+        [data, hora, veterinario_id], (err, row) => {
+        
+        if (row) {
+            return res.status(400).json({ error: "Horário indisponível para este veterinário." });
+        }
+
     db.run(`INSERT INTO agenda (clinic_id, cliente, pet, data, hora, tipo, especialidade, veterinario, obs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
     [clinic_id, cliente, pet, data, hora, tipo, especialidade, veterinario, obs], function(err) {
         if (err) return res.status(500).json({ error: "Erro ao salvar agendamento." });
@@ -487,4 +495,4 @@ async function enviarEmailContaCriada(destinatario, nome, role, cpf) {
     } catch (error) {
         console.error("Erro ao enviar e-mail:", error);
     }
-}
+}});
