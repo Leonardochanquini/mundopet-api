@@ -19,67 +19,133 @@
         let prontuarios = [];
         let especialidadesClinica = [];
 
+        function temMudancaEmLista(novaLista, listaAnterior) {
+            if (!Array.isArray(novaLista) || !Array.isArray(listaAnterior)) {
+               return novaLista !== listaAnterior;
+            }
+
+            if (novaLista.length !== listaAnterior.length) {
+               return true;
+            }
+
+            for (let i = 0; i < novaLista.length; i += 1) {
+               if (JSON.stringify(novaLista[i]) !== JSON.stringify(listaAnterior[i])) {
+                   return true;
+               }
+            }
+
+            return false;
+        }
+
         async function sincronizarDados() {
             if (!clinicaId) return;
+
+            const endpoints = [
+               { key: 'colaboradores', url: `/api/colaboradores/${clinicaId}` },
+               { key: 'transacoes', url: `/api/transacoes/${clinicaId}` },
+               { key: 'estoque', url: `/api/estoque/${clinicaId}` },
+               { key: 'agenda', url: `/api/agenda/${clinicaId}` },
+               { key: 'prontuarios', url: `/api/prontuarios/${clinicaId}` },
+               { key: 'clientes', url: `/api/clientes/${clinicaId}` },
+               { key: 'especialidades', url: `/api/especialidades/${clinicaId}` },
+               { key: 'clinica', url: `/api/clinica/${clinicaId}` }
+            ];
+
             try {
-                // 1. Adicionado o fetch de clientes na mesma chamada
-                const [colabRes, transRes, estRes, agendaRes, pronRes, cliRes, espRes, clinicaRes] = await Promise.all([
-                    fetch(`/api/colaboradores/${clinicaId}`),
-                    fetch(`/api/transacoes/${clinicaId}`),
-                    fetch(`/api/estoque/${clinicaId}`),
-                    fetch(`/api/agenda/${clinicaId}`).catch(() => null),
-                    fetch(`/api/prontuarios/${clinicaId}`).catch(() => null),
-                    fetch(`/api/clientes/${clinicaId}`).catch(() => null),
-                    fetch(`/api/especialidades/${clinicaId}`).catch(() => null),
-                    fetch(`/api/clinica/${clinicaId}`).catch(() => null)
-                ]);
+               const respostas = await Promise.all(endpoints.map(async (endpoint) => {
+                   try {
+                       const response = await fetch(endpoint.url);
+                       if (!response || !response.ok) {
+                           return { key: endpoint.key, data: null };
+                       }
 
-                if (espRes && espRes.ok) especialidadesClinica = await espRes.json();
-                if (clinicaRes && clinicaRes.ok) {
-                    const dados = await clinicaRes.json();
-}                   
-                atualizarSelectsEspecialidades();
-                let mudouRecepcao = false;
+                       const data = await response.json();
+                       return { key: endpoint.key, data };
+                   } catch (error) {
+                       console.warn(`Falha ao buscar ${endpoint.url}:`, error);
+                       return { key: endpoint.key, data: null };
+                   }
+               }));
 
-                if (colabRes && colabRes.ok) equipe = await colabRes.json();
-                if (estRes && estRes.ok) estoque = await estRes.json();
-                if (pronRes && pronRes.ok) prontuarios = await pronRes.json();
-                
-                // 2. Compara os dados novos com os antigos; só sinaliza mudança se o dado realmente alterou
-                if (transRes && transRes.ok) {
-                    const novTr = await transRes.json();
-                    if (JSON.stringify(novTr) !== JSON.stringify(transacoes)) { transacoes = novTr; mudouRecepcao = true; }
-                }
-                if (agendaRes && agendaRes.ok) {
-                    const novAg = await agendaRes.json();
-                    if (JSON.stringify(novAg) !== JSON.stringify(agendamentos)) { agendamentos = novAg; mudouRecepcao = true; }
-                }
-                if (cliRes && cliRes.ok) {
-                    const novCli = await cliRes.json();
-                    if (JSON.stringify(novCli) !== JSON.stringify(window.clientesLista || [])) { window.clientesLista = novCli; mudouRecepcao = true; }
-                }
+               const dados = Object.fromEntries(respostas.map((item) => [item.key, item.data]));
 
-                // 3. Atualiza as abas da Recepção automaticamente para todos os colaboradores em tempo real
-                if (mudouRecepcao && clinicaLogada && clinicaLogada.role === 'Recepção') {
-                    const modAtivo = document.querySelector('.sidebar-item.active');
-                    if (modAtivo) {
-                        const nomeMod = modAtivo.innerText;
-                        if (nomeMod.includes('Dashboard')) navegarModulo('recepcao-dashboard');
-                        else if (nomeMod.includes('Fila')) navegarModulo('fila');
-                        else if (nomeMod.includes('Caixa')) navegarModulo('caixa');
-                        else if (nomeMod.includes('Relatórios')) navegarModulo('relatorios');
-                        else if (nomeMod.includes('Agenda') && typeof window.renderizarCalendario === 'function') window.renderizarCalendario();
-                        
-                        // Atualiza as tabelas de clientes e pets apenas se o usuário não estiver digitando na barra de busca (evita bugar a digitação)
-                        else if (nomeMod.includes('Clientes') && document.getElementById('busca-cliente')?.value === '') {
-                            if (typeof renderClientes === 'function') renderClientes(window.clientesLista);
-                        }
-                        else if (nomeMod.includes('Pets') && document.getElementById('busca-pet')?.value === '') {
-                            if (typeof renderPets === 'function') renderPets(window.clientesLista);
-                        }
-                    }
-                }
-            } catch (e) { console.error("Erro ao sincronizar dados:", e); }
+               if (Array.isArray(dados.especialidades)) {
+                   especialidadesClinica = dados.especialidades;
+               }
+
+               if (dados.clinica && typeof dados.clinica === 'object') {
+                   const clinicaDados = dados.clinica;
+                   if (clinicaLogada) {
+                       clinicaLogada.nomeClinica = clinicaDados.nome || clinicaLogada.nomeClinica;
+                       clinicaLogada.logo = clinicaDados.logotipo || clinicaLogada.logo;
+                       clinicaLogada.cnpj = clinicaDados.cnpj || clinicaLogada.cnpj || '';
+                       clinicaLogada.telefone = clinicaDados.telefone || clinicaLogada.telefone || '';
+                       clinicaLogada.endereco = clinicaDados.endereco || clinicaLogada.endereco || '';
+                       clinicaLogada.email_contato = clinicaDados.email_contato || clinicaLogada.email_contato || '';
+                   }
+               }
+
+               atualizarSelectsEspecialidades();
+
+               if (Array.isArray(dados.colaboradores)) {
+                   equipe = dados.colaboradores;
+               }
+
+               if (Array.isArray(dados.estoque)) {
+                   estoque = dados.estoque;
+               }
+
+               if (Array.isArray(dados.prontuarios)) {
+                   prontuarios = dados.prontuarios;
+               }
+
+               let mudouRecepcao = false;
+
+               if (Array.isArray(dados.transacoes) && temMudancaEmLista(dados.transacoes, transacoes)) {
+                   transacoes = dados.transacoes;
+                   mudouRecepcao = true;
+               }
+
+               if (Array.isArray(dados.agenda) && temMudancaEmLista(dados.agenda, agendamentos)) {
+                   agendamentos = dados.agenda;
+                   mudouRecepcao = true;
+               }
+
+               const clientesAtuais = Array.isArray(window.clientesLista) ? window.clientesLista : [];
+               if (Array.isArray(dados.clientes) && temMudancaEmLista(dados.clientes, clientesAtuais)) {
+                   window.clientesLista = dados.clientes;
+                   mudouRecepcao = true;
+               }
+
+               if (mudouRecepcao && clinicaLogada && clinicaLogada.role === 'Recepção') {
+                   const modAtivo = document.querySelector('.sidebar-item.active');
+                   if (modAtivo) {
+                       const nomeMod = modAtivo.innerText;
+
+                       if (nomeMod.includes('Dashboard')) {
+                           navegarModulo('recepcao-dashboard');
+                       } else if (nomeMod.includes('Fila')) {
+                           navegarModulo('fila');
+                       } else if (nomeMod.includes('Caixa')) {
+                           navegarModulo('caixa');
+                       } else if (nomeMod.includes('Relatórios')) {
+                           navegarModulo('relatorios');
+                       } else if (nomeMod.includes('Agenda') && typeof window.renderizarCalendario === 'function') {
+                           window.renderizarCalendario();
+                       } else if (nomeMod.includes('Clientes') && document.getElementById('busca-cliente')?.value === '') {
+                           if (typeof renderClientes === 'function') {
+                               renderClientes(window.clientesLista);
+                           }
+                       } else if (nomeMod.includes('Pets') && document.getElementById('busca-pet')?.value === '') {
+                           if (typeof renderPets === 'function') {
+                               renderPets(window.clientesLista);
+                           }
+                       }
+                   }
+               }
+            } catch (error) {
+               console.error('Erro ao sincronizar dados:', error);
+            }
         }
 
         function mascaraMoeda(i) {
